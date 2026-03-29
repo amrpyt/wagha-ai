@@ -20,6 +20,15 @@
 
 **Requirements:** AUTH-01 through AUTH-07, BILL-01 through BILL-07, DASH-01 through DASH-05, UI-01 through UI-06
 
+**Plans:** 5 plans
+
+Plans:
+- [x] 01-01-PLAN.md — Foundation & Infrastructure (Wave 1: Next.js, RTL, Noor-UI, Supabase, DB schema)
+- [ ] 01-02-PLAN.md — Authentication Flows (Wave 2: Signup, Login, Verification, Password Reset, Logout)
+- [ ] 01-03-PLAN.md — Dashboard & Projects (Wave 2: Sidebar, Project Grid, Project Detail, Delete)
+- [ ] 01-04-PLAN.md — Settings & Team (Wave 2: Account Settings, Firm Settings, Team Invites)
+- [ ] 01-05-PLAN.md — Billing & Pricing (Wave 2: Pricing Page, Paymob, Webhooks, Billing Settings)
+
 **Success Criteria:**
 1. Firm can sign up with email/password and receive email verification
 2. User can log in, stay logged in, reset password, log out
