@@ -2,11 +2,11 @@
 
 ## What This Is
 
-An Arabic AI-powered architectural rendering tool that lets architecture firms upload 2D floor plans or building photos and instantly generate photorealistic 3D exterior renders — replacing a process that traditionally takes weeks with a 3D artist, down to one minute with AI. The tool wraps Nano Banana 2 inside a polished Arabic UI with professional pre-built prompts, so the firm's client gets a beautifully formatted PDF deliverable without any AI back-and-forth.
+A **multi-tenant SaaS** targeting architecture firms in Arabic-speaking markets. Firms self-serve signup, subscribe via Stripe, upload 2D floor plans or building photos, and receive photorealistic 3D exterior renders powered by Nano Banana 2 — delivered as a branded Arabic PDF. The pre-built prompts hide AI complexity; the branded PDF is what firms send to their own clients.
 
 ## Core Value
 
-Turn a 2D architectural plan or building photo into a photorealistic 3D exterior render in under 60 seconds — and deliver it as a branded PDF to the client.
+Architecture firms subscribe → upload a 2D plan → get a branded PDF render in under 60 seconds → send to their client.
 
 ## Requirements
 
@@ -50,21 +50,24 @@ Turn a 2D architectural plan or building photo into a photorealistic 3D exterior
 
 ## Constraints
 
-- **Tech**: Web app (Arabic RTL frontend, backend for file handling and PDF generation)
-- **AI**: Nano Banana 2 for image generation — no alternative for MVP
-- **Timeline**: MVP scoped to ship quickly to validate with the architecture firm
-- **Scope**: Exterior only — no interior renders, no authentication, no payments
+- **Tech**: Next.js 16 + React 19 (full-stack SaaS), multi-tenant database
+- **AI**: Nano Banana 2 (Google's API — paid per render, markup on subscription)
+- **Payments**: Stripe subscription (self-serve signup, free trial, monthly/annual)
+- **PDF**: pdfmake-rtl (Arabic RTL built-in)
+- **Scope**: Exterior only — no interior renders for MVP
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Nano Banana 2 as AI engine | Already proven working for this exact use case | — Pending |
-| Arabic RTL only, no bilingual toggle | Arabic-speaking firm; simplify MVP scope | — Pending |
-| Exterior only (no interior) | User explicitly scoped to mnml.ai/exterior-ai equivalent | — Pending |
-| No auth/payments for MVP | Validate product with single client first | — Pending |
-| PDF export with branding | Core deliverable — what makes it useful to the firm | — Pending |
+| Nano Banana 2 as AI engine | Already proven for this use case; fast, photorealistic | — Pending |
+| Arabic RTL only, no bilingual | Arabic market first; simplify MVP scope | — Pending |
+| pdfmake-rtl for PDF | Arabic RTL built-in, production-ready NPM package | — Pending |
+| Multi-tenant from day 1 | Self-serve SaaS; each firm has isolated data | — Pending |
+| Stripe subscriptions | Standard SaaS billing; free trial → paid | — Pending |
+| Exterior only (no interior) | User scoped to mnml.ai/exterior-ai equivalent | — Pending |
+| Noor-UI RTL components | 78 free Arabic RTL components; don't rebuild | — Pending |
 
 ---
 
-*Last updated: 2026-03-29 after initialization*
+*Last updated: 2026-03-29 after initialization (updated SaaS scope: multi-tenant, Stripe, dashboard)*

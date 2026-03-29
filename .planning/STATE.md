@@ -1,14 +1,14 @@
 # State: Wagha-ai
 
-**Last updated:** 2026-03-29 after initialization
+**Last updated:** 2026-03-29 after SaaS scope expansion
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-29 after initialization)
+See: .planning/PROJECT.md (updated 2026-03-29)
 
-**Core value:** Turn a 2D architectural plan or building photo into a photorealistic 3D exterior render in under 60 seconds — and deliver it as a branded PDF to the client.
+**Core value:** Architecture firms subscribe → upload a 2D plan → get a branded PDF render in under 60 seconds → send to their client.
 
-**Current focus:** Phase 1: Foundation & Arabic UI
+**Current focus:** Phase 1: SaaS Foundation & Arabic UI
 
 ## Session
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-03-29 after initialization)
 
 | # | Phase | Status | Requirements |
 |---|-------|--------|--------------|
-| 1 | Foundation & Arabic UI | Pending | 11 |
-| 2 | AI Integration | Pending | 7 |
+| 1 | SaaS Foundation & Arabic UI | Pending | 31 |
+| 2 | Upload & AI Integration | Pending | 13 |
 | 3 | Result Display & Download | Pending | 5 |
-| 4 | Branded PDF Export | Pending | 6 |
-| 5 | Prompt Refinement & Branding | Pending | 4 |
+| 4 | Branded PDF Export | Pending | 7 |
+| 5 | Prompt Refinement | Pending | 3 |
 
 **Milestone completion:** 0% — Not started
 
@@ -41,29 +41,36 @@ See: .planning/PROJECT.md (updated 2026-03-29 after initialization)
 
 | Area | Total | Complete | Pending |
 |------|-------|----------|---------|
+| Auth & Multi-Tenancy | 7 | 0 | 7 |
+| Subscriptions & Billing | 7 | 0 | 7 |
+| Dashboard | 5 | 0 | 5 |
 | Upload | 6 | 0 | 6 |
 | AI Rendering | 7 | 0 | 7 |
 | Display & Download | 5 | 0 | 5 |
-| PDF Export | 6 | 0 | 6 |
-| UI / UX | 5 | 0 | 5 |
+| PDF Export | 7 | 0 | 7 |
+| UI / UX | 6 | 0 | 6 |
 
 ### v2 Requirements
 
 | Area | Total | Complete | Pending |
 |------|-------|----------|---------|
 | Prompt Refinement | 3 | 0 | 3 |
-| PDF Customization | 2 | 0 | 2 |
 
 ## Open Decisions
 
 | Area | Decision Needed | Blocking |
 |------|-----------------|----------|
 | Nano Banana 2 API | Exact endpoint, auth method, rate limits, response format | Phase 2 |
-| Arabic PDF fonts | Noto Sans Arabic licensing for commercial PDF output | Phase 4 |
-| PDF delivery | Download link vs. email attachment | Phase 4 |
-| Firm branding | Logo placement, color accent positions | Phase 5 |
+| Stripe pricing | Monthly/annual amounts, trial length | Phase 1 |
+| Database | SQLite (MVP) or PostgreSQL (scaling) | Phase 1 |
+| Hosting | Vercel, Railway, or other | Phase 1 |
+| Noor-UI integration | How to integrate RTL components with Next.js | Phase 1 |
 
 ## Notes
 
-- 2026-03-29: Project initialized. Research complete. Roadmap with 5 phases created.
-- Pilot architecture firm is the paying client — product validates with single user first.
+- 2026-03-29: Project initialized. Research complete. Roadmap revised for SaaS multi-tenant.
+- Business model: self-serve SaaS with Stripe subscriptions.
+- First customer: architecture firm leader who wants this for their firm.
+- Building multi-tenant from day 1 (not retrofitting later).
+- pdfmake-rtl for Arabic RTL PDF (not @react-pdf/renderer).
+- Noor-UI RTL component library to be used for standard UI elements.
