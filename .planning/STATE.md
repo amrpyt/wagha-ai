@@ -8,7 +8,24 @@ See: .planning/PROJECT.md (updated 2026-03-29)
 
 **Core value:** Architecture firms subscribe → upload a 2D plan → get a branded PDF render in under 60 seconds → send to their client.
 
-**Current focus:** Phase 1: SaaS Foundation & Arabic UI
+**Current focus:** Phase 1: SaaS Foundation & Arabic UI (context gathered)
+
+## Decisions Logged
+
+| # | Decision | Value |
+|---|----------|-------|
+| 1 | Database | PostgreSQL via Supabase |
+| 2 | Hosting | Vercel + Supabase |
+| 3 | Auth | Supabase Auth |
+| 4 | Render resolution | 1K (1024px) |
+| 5 | Free offer | 1 render total (lead gen) |
+| 6 | Credit rollover | No rollover |
+| 7 | Credits = renders | 1 credit = 1 render at 1K |
+| 8 | Starter tier | 250 EGP/mo → 10 renders |
+| 9 | Business tier | 750 EGP/mo → 30 renders |
+| 10 | Pro tier | 2,000 EGP/mo → 100 renders |
+| 11 | Dashboard | Folder-based, all team see all |
+| 12 | Team access | All members see all projects |
 
 ## Session
 
@@ -61,9 +78,9 @@ See: .planning/PROJECT.md (updated 2026-03-29)
 | Area | Decision Needed | Blocking |
 |------|-----------------|----------|
 | Nano Banana 2 API | Exact endpoint, auth method, rate limits, response format | Phase 2 |
-| Stripe pricing | Monthly/annual amounts, trial length | Phase 1 |
-| Database | SQLite (MVP) or PostgreSQL (scaling) | Phase 1 |
-| Hosting | Vercel, Railway, or other | Phase 1 |
+| Stripe pricing | ~~Monthly/annual amounts, trial length~~ | ✓ Decided |
+| Database | ~~SQLite vs PostgreSQL~~ | ✓ Decided: PostgreSQL via Supabase |
+| Hosting | ~~Vercel, Railway, or other~~ | ✓ Decided: Vercel + Supabase |
 | Noor-UI integration | How to integrate RTL components with Next.js | Phase 1 |
 
 ## Notes
@@ -74,3 +91,4 @@ See: .planning/PROJECT.md (updated 2026-03-29)
 - Building multi-tenant from day 1 (not retrofitting later).
 - pdfmake-rtl for Arabic RTL PDF (not @react-pdf/renderer).
 - Noor-UI RTL component library to be used for standard UI elements.
+- 2026-03-29: Phase 1 context gathered. All infrastructure/billing/dashboard decisions locked.
