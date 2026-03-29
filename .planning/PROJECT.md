@@ -52,7 +52,7 @@ Architecture firms subscribe → upload a 2D plan → get a branded PDF render i
 
 - **Tech**: Next.js 16 + React 19 (full-stack SaaS), multi-tenant database
 - **AI**: Nano Banana 2 (Google's API — paid per render, markup on subscription)
-- **Payments**: Stripe subscription (self-serve signup, free trial, monthly/annual)
+- **Payments**: Paymob subscription (self-serve signup, free trial, monthly/annual) — Stripe not available in Egypt
 - **PDF**: pdfmake-rtl (Arabic RTL built-in)
 - **Scope**: Exterior only — no interior renders for MVP
 
@@ -64,7 +64,7 @@ Architecture firms subscribe → upload a 2D plan → get a branded PDF render i
 | Arabic RTL only, no bilingual | Arabic market first; simplify MVP scope | — Pending |
 | pdfmake-rtl for PDF | Arabic RTL built-in, production-ready NPM package | — Pending |
 | Multi-tenant from day 1 | Self-serve SaaS; each firm has isolated data | — Pending |
-| Stripe subscriptions | Standard SaaS billing; free trial → paid | — Pending |
+| Stripe subscriptions | ~~Stripe~~ Paymob — Stripe not available in Egypt | — Pending |
 | Exterior only (no interior) | User scoped to mnml.ai/exterior-ai equivalent | — Pending |
 | Noor-UI RTL components | 78 free Arabic RTL components; don't rebuild | — Pending |
 

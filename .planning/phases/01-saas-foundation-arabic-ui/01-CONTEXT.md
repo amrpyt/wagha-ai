@@ -51,10 +51,10 @@ Multi-tenant SaaS infrastructure: authentication, Stripe subscriptions, database
 - **D-24:** Password reset via email link
 
 ### Stripe Integration
-- **D-25:** Stripe checkout for subscription payment
+- **D-25:** Paymob payment gateway for subscription payment (Stripe not available in Egypt)
 - **D-26:** Free trial = 1 render (not time-based) — rendered immediately on signup
 - **D-27:** After free render used, firm sees upgrade prompt to subscribe
-- **D-28:** Subscription managed via Stripe billing portal (cancel, upgrade, invoices)
+- **D-28:** Subscription managed via Paymob billing portal (cancel, upgrade, invoices)
 
 ### Claude's Discretion
 - Folder naming conventions — planner decides
@@ -87,6 +87,7 @@ Multi-tenant SaaS infrastructure: authentication, Stripe subscriptions, database
 - `https://github.com/aysnet1/pdfmake-rtl` — pdfmake-rtl NPM package for Arabic RTL PDF generation
 - `https://github.com/ositaka/noor-ui/` — Noor-UI RTL-first design system (78 Arabic RTL components)
 - `https://tailwindcss.com/docs/guides/v4` — Tailwind CSS v4 setup
+- `https://paymob.com/` — Egyptian payment gateway (Stripe alternative for Egypt market)
 
 </canonical_refs>
 

@@ -167,4 +167,17 @@
 
 ---
 
+## Billing Method
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Stripe | Standard SaaS billing (not available in Egypt) | |
+| Paymob | Egyptian payment gateway | ✓ |
+
+**User's choice:** Paymob
+**Note:** Stripe does not work in Egypt — Paymob is the standard alternative
+
+---
+
 *Logged: 2026-03-29*
+*Updated: 2026-03-29 — Paymob replaces Stripe (not available in Egypt)*

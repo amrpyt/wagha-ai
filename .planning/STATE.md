@@ -26,6 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-29)
 | 10 | Pro tier | 2,000 EGP/mo → 100 renders |
 | 11 | Dashboard | Folder-based, all team see all |
 | 12 | Team access | All members see all projects |
+| 13 | Billing | Paymob (Egyptian payment gateway) |
 
 ## Session
 
@@ -78,7 +79,7 @@ See: .planning/PROJECT.md (updated 2026-03-29)
 | Area | Decision Needed | Blocking |
 |------|-----------------|----------|
 | Nano Banana 2 API | Exact endpoint, auth method, rate limits, response format | Phase 2 |
-| Stripe pricing | ~~Monthly/annual amounts, trial length~~ | ✓ Decided |
+| Paymob integration | How to integrate Paymob subscription API with Next.js | Phase 1 |
 | Database | ~~SQLite vs PostgreSQL~~ | ✓ Decided: PostgreSQL via Supabase |
 | Hosting | ~~Vercel, Railway, or other~~ | ✓ Decided: Vercel + Supabase |
 | Noor-UI integration | How to integrate RTL components with Next.js | Phase 1 |
@@ -86,9 +87,10 @@ See: .planning/PROJECT.md (updated 2026-03-29)
 ## Notes
 
 - 2026-03-29: Project initialized. Research complete. Roadmap revised for SaaS multi-tenant.
-- Business model: self-serve SaaS with Stripe subscriptions.
+- Business model: self-serve SaaS with Paymob subscriptions (Stripe not available in Egypt).
 - First customer: architecture firm leader who wants this for their firm.
 - Building multi-tenant from day 1 (not retrofitting later).
 - pdfmake-rtl for Arabic RTL PDF (not @react-pdf/renderer).
 - Noor-UI RTL component library to be used for standard UI elements.
 - 2026-03-29: Phase 1 context gathered. All infrastructure/billing/dashboard decisions locked.
+- Billing: Paymob (not Stripe — Stripe not available in Egypt).
