@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Base RTL styles */
+body {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  background-color: #FAFAFA;
+}
