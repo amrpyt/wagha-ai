@@ -6,7 +6,7 @@
 
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|------------------|
-| 1 | SaaS Foundation & Arabic UI | Multi-tenant auth, Stripe, database, Arabic RTL UI | 31 | Firm can signup, subscribe, see dashboard |
+| 1 | SaaS Foundation & Arabic UI | Multi-tenant auth, Paymob, database, Arabic RTL UI | 31 | Firm can signup, subscribe, see dashboard |
 | 2 | Upload & AI Integration | File upload + Nano Banana 2 renders | 13 | Upload → render in <60s with progress feedback |
 | 3 | Result Display & Download | Render visible, downloadable | 5 | Render preview displays, JPG downloads |
 | 4 | Branded PDF Export | Arabic RTL PDF with firm branding | 7 | PDF opens in Arabic RTL with logo |
@@ -16,33 +16,33 @@
 
 ## Phase 1: SaaS Foundation & Arabic UI
 
-**Goal:** Multi-tenant SaaS infrastructure — auth, Stripe subscription billing, database, Arabic RTL UI foundation.
+**Goal:** Multi-tenant SaaS infrastructure — auth, Paymob subscription billing, database, Arabic RTL UI foundation.
 
 **Requirements:** AUTH-01 through AUTH-07, BILL-01 through BILL-07, DASH-01 through DASH-05, UI-01 through UI-06
 
 **Plans:** 5 plans
 
 Plans:
-- [x] 01-01-PLAN.md — Foundation & Infrastructure (Wave 1: Next.js, RTL, Noor-UI, Supabase, DB schema)
-- [ ] 01-02-PLAN.md — Authentication Flows (Wave 2: Signup, Login, Verification, Password Reset, Logout)
-- [ ] 01-03-PLAN.md — Dashboard & Projects (Wave 2: Sidebar, Project Grid, Project Detail, Delete)
-- [ ] 01-04-PLAN.md — Settings & Team (Wave 2: Account Settings, Firm Settings, Team Invites)
-- [ ] 01-05-PLAN.md — Billing & Pricing (Wave 2: Pricing Page, Paymob, Webhooks, Billing Settings)
+- [x] 01-01-PLAN.md — Foundation & Infrastructure (Wave 1: Next.js, RTL, Supabase, DB schema)
+- [x] 01-02-PLAN.md — Authentication Flows (Wave 2: Signup, Login, Verification, Password Reset, Logout)
+- [x] 01-03-PLAN.md — Dashboard & Projects (Wave 2: Sidebar, Project Grid, Project Detail, Delete)
+- [x] 01-04-PLAN.md — Settings & Team (Wave 2: Account Settings, Firm Settings, Team Invites)
+- [x] 01-05-PLAN.md — Billing & Pricing (Wave 2: Pricing Page, Paymob, Webhooks, Billing Settings)
 
 **Success Criteria:**
 1. Firm can sign up with email/password and receive email verification
 2. User can log in, stay logged in, reset password, log out
 3. Firm admin can invite team members by email
 4. Each firm sees only their own data (multi-tenant isolation)
-5. Stripe pricing page showing monthly/annual plans
-6. Free trial starts without payment — renders work immediately
-7. After trial expires, firm sees upgrade prompt — renders blocked
-8. Firm can subscribe via Stripe checkout
-9. Firm can view invoices and cancel subscription in settings
+5. Pricing page showing 3 plans in EGP (Starter 250, Business 750, Pro 2000)
+6. Free render on signup — renders work immediately
+7. After free render used, firm sees upgrade prompt — renders blocked
+8. Firm can subscribe via Paymob checkout
+9. Firm can view credits and cancel subscription in settings
 10. Dashboard shows past projects for the firm
 11. Firm settings: firm name, logo upload, primary brand color
-12. Full Arabic RTL UI — no English text, RTL layout, Noto Sans Arabic font
-13. Noor-UI RTL components used for standard UI elements
+12. Full Arabic RTL UI — RTL layout, Noto Sans Arabic font, native HTML + Tailwind components
+13. Account settings: name, email, password change
 
 **Phase Type:** Infrastructure
 
