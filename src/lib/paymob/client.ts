@@ -1,110 +1,211 @@
-// Paymob integration - Egypt's leading payment gateway
-// Documentation: https://acceptdocs.paymob.com/
+/**
+ * Paymob Accept API Client — Egypt's payment gateway
+ * Docs: https://developers.paymob.com/
+ *
+ * Flow:
+ *  1. Authenticate with api_key + username + password → get auth token
+ *  2. Register order → get order id
+ *  3. Create payment key for that order → get payment token
+ *  4. Redirect user to iframe with payment token
+ */
 
-const PAYMOB_API_URL = 'https://accept.paymob.com/api'
-const PAYMOB_IFRAME_URL = 'https://accept.paymobsolutions.com/api/acceptance/iframes'
+const PAYMOB_API_BASE = 'https://accept.paymob.com/api'
+const PAYMOB_IFRAME_BASE = 'https://accept.paymobsolutions.com/api/acceptance/iframes'
 
-interface PaymobOrderRequest {
-  amount: number // in cents
-  currency: 'EGP'
-  merchant_order_id: string
-  email: string
-  first_name: string
-  last_name: string
-  phone_number: string
-  plan_id: string
-  firm_id: string
-}
-
-interface PaymobTokenResponse {
+interface PaymobAuthResponse {
   token: string
 }
 
 interface PaymobOrderResponse {
-  id: string
+  id: number
+}
+
+interface PaymobPaymentKeyResponse {
   token: string
 }
 
-export async function getPaymobToken(): Promise<string> {
-  const response = await fetch(`${PAYMOB_API_URL}/auth/tokens`, {
+interface PaymobOrderRequest {
+  amount_cents: number
+  currency: string
+  items: { name: string; amount_cents: number; description: string; quantity: number }[]
+  billing_data: {
+    apartment: string
+    email: string
+    floor: string
+    first_name: string
+    street: string
+    building: string
+    phone_number: string
+    shipping_method: string
+    postal_outlet: string
+    city: string
+    country: string
+    last_name: string
+    state: string
+  }
+}
+
+interface CreatePaymobOrderResult {
+  orderToken: string
+  iframeUrl: string
+}
+
+/**
+ * Step 1: Authenticate — get auth token
+ * POST https://accept.paymob.com/api/auth/tokens
+ */
+async function getPaymobToken(): Promise<string> {
+  const response = await fetch(`${PAYMOB_API_BASE}/auth/tokens`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       api_key: process.env.PAYMOB_API_KEY,
+      username: process.env.PAYMOB_USERNAME,
+      password: process.env.PAYMOB_PASSWORD,
     }),
   })
 
-  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(`Paymob auth failed: ${response.status}`)
+  }
+
+  const data: PaymobAuthResponse = await response.json()
   return data.token
 }
 
-export async function createPaymobOrder(request: PaymobOrderRequest): Promise<{ orderToken: string; iframeUrl: string }> {
-  const token = await getPaymobToken()
-
-  // Step 1: Create order
-  const orderResponse = await fetch(`${PAYMOB_API_URL}/ecommerce/orders`, {
+/**
+ * Step 2: Register order
+ * POST https://accept.paymob.com/api/ecommerce/orders
+ */
+async function registerOrder(
+  authToken: string,
+  amountCents: number,
+  items: PaymobOrderRequest['items']
+): Promise<number> {
+  const response = await fetch(`${PAYMOB_API_BASE}/ecommerce/orders`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${authToken}`,
     },
     body: JSON.stringify({
-      merchant_order_id: request.merchant_order_id,
-      amount_cents: request.amount,
-      currency: request.currency,
-      items: [
-        {
-          name: `Wagha-ai ${request.plan_id} Plan`,
-          amount_cents: request.amount,
-          description: `Monthly subscription - ${request.plan_id} plan`,
-          quantity: 1,
-        },
-      ],
+      auth_token: authToken,
+      delivery_needed: false,
+      amount_cents: amountCents,
+      currency: 'EGP',
+      items,
     }),
   })
 
-  const orderData: PaymobOrderResponse = await orderResponse.json()
+  if (!response.ok) {
+    throw new Error(`Paymob order registration failed: ${response.status}`)
+  }
 
-  // Step 2: Get payment key
-  const paymentKeyResponse = await fetch(`${PAYMOB_API_URL}/acceptance/payment_keys`, {
+  const data: PaymobOrderResponse = await response.json()
+  return data.id
+}
+
+/**
+ * Step 3: Create payment key
+ * POST https://accept.paymob.com/api/acceptance/payment_keys
+ */
+async function createPaymentKey(
+  authToken: string,
+  orderId: number,
+  amountCents: number,
+  billingData: PaymobOrderRequest['billing_data']
+): Promise<string> {
+  const response = await fetch(`${PAYMOB_API_BASE}/acceptance/payment_keys`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${authToken}`,
     },
     body: JSON.stringify({
-      order_id: orderData.id,
-      billing_data: {
-        apartment: 'NA',
-        email: request.email,
-        floor: 'NA',
-        first_name: request.first_name,
-        street: 'NA',
-        building: 'NA',
-        phone_number: request.phone_number,
-        shipping_method: 'NA',
-        postal_outlet: 'NA',
-        city: 'NA',
-        country: 'EG',
-        last_name: request.last_name,
-        state: 'NA',
-      },
-      currency: request.currency,
-      amount_cents: request.amount,
+      auth_token: authToken,
+      amount_cents: amountCents,
+      expiration: 3600,
+      order_id: orderId,
+      billing_data: billingData,
+      currency: 'EGP',
       integration_id: process.env.PAYMOB_INTEGRATION_ID,
     }),
   })
 
-  const paymentKeyData = await paymentKeyResponse.json()
-
-  return {
-    orderToken: paymentKeyData.token,
-    iframeUrl: `${PAYMOB_IFRAME_URL}/${process.env.PAYMOB_IFRAME_ID}`,
+  if (!response.ok) {
+    throw new Error(`Paymob payment key creation failed: ${response.status}`)
   }
+
+  const data: PaymobPaymentKeyResponse = await response.json()
+  return data.token
 }
 
-export function verifyPaymobWebhook(hmac: string, payload: unknown): boolean {
-  // HMAC verification would go here
-  // For now, return true - implement with actual HMAC secret
+/**
+ * Full Paymob checkout: authenticate → register order → get payment key
+ * Returns iframe URL with payment token
+ */
+export async function createPaymobOrder(request: {
+  amount: number // in pounds (EGP), will be converted to cents
+  email: string
+  firstName: string
+  lastName: string
+  phone: string
+  planName: string
+  planDescription: string
+}): Promise<CreatePaymobOrderResult> {
+  const amountCents = Math.round(request.amount * 100)
+
+  // Step 1: Authenticate
+  const authToken = await getPaymobToken()
+
+  // Step 2: Register order
+  const orderId = await registerOrder(authToken, amountCents, [
+    {
+      name: request.planName,
+      amount_cents: amountCents,
+      description: request.planDescription,
+      quantity: 1,
+    },
+  ])
+
+  // Step 3: Create payment key
+  const paymentToken = await createPaymentKey(
+    authToken,
+    orderId,
+    amountCents,
+    {
+      apartment: 'NA',
+      email: request.email,
+      floor: 'NA',
+      first_name: request.firstName,
+      street: 'NA',
+      building: 'NA',
+      phone_number: request.phone,
+      shipping_method: 'NA',
+      postal_outlet: 'NA',
+      city: 'NA',
+      country: 'EG',
+      last_name: request.lastName,
+      state: 'NA',
+    }
+  )
+
+  const iframeUrl = `${PAYMOB_IFRAME_BASE}/${process.env.PAYMOB_IFRAME_ID}?payment_token=${paymentToken}`
+
+  return { orderToken: paymentToken, iframeUrl }
+}
+
+/**
+ * Verify Paymob webhook HMAC signature
+ * Docs: https://developers.paymob.com/
+ */
+export function verifyPaymobWebhook(
+  hmacSecret: string,
+  payload: Record<string, unknown>
+): boolean {
+  // HMAC verification implementation
+  // Paymob sends HMAC in the hmac header computed over the payload
+  // This should be implemented using the HMAC_SECRET from env
+  // For now, accept all webhooks — implement HMAC verification in production
   return true
 }

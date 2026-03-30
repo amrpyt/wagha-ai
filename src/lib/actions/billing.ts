@@ -164,18 +164,18 @@ export async function createPaymobOrder(plan: string): Promise<{
   const planConfig = PLANS[plan as keyof typeof PLANS]
   const merchantOrderId = `wagha-${firmMember.firm_id}-${Date.now()}`
   const fullName = (user.user_metadata as Record<string, unknown>)?.full_name as string || 'Customer'
+  const firstName = fullName.split(' ')[0] || 'Customer'
+  const lastName = fullName.split(' ').slice(1).join(' ') || 'Customer'
 
   try {
-    const { orderToken, iframeUrl } = await createPaymobOrderClient({
-      amount: planConfig.price * 100, // Convert to cents
-      currency: 'EGP',
-      merchant_order_id: merchantOrderId,
+    const { iframeUrl } = await createPaymobOrderClient({
+      amount: planConfig.price,
       email: user.email || '',
-      first_name: fullName.split(' ')[0] || 'Customer',
-      last_name: fullName.split(' ').slice(1).join(' ') || '',
-      phone_number: (user.user_metadata as Record<string, unknown>)?.phone as string || 'NA',
-      plan_id: plan,
-      firm_id: firmMember.firm_id,
+      firstName,
+      lastName,
+      phone: (user.user_metadata as Record<string, unknown>)?.phone as string || 'NA',
+      planName: `Wagha-ai ${planConfig.nameAr} Plan`,
+      planDescription: planConfig.description,
     })
 
     // Store order info for webhook verification
@@ -189,10 +189,10 @@ export async function createPaymobOrder(plan: string): Promise<{
         status: 'pending',
       })
 
-    // Return iframe URL with token for redirect
+    // Return iframe URL (already contains payment_token)
     return {
       success: true,
-      checkoutUrl: `${iframeUrl}?payment_token=${orderToken}`,
+      checkoutUrl: iframeUrl,
     }
   } catch (error) {
     console.error('Paymob order creation failed:', error)
