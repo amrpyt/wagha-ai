@@ -1,8 +1,7 @@
 'use client'
 
-import { useDropzone } from 'react-dropzone'
+import { useDropzone, type FileRejection } from 'react-dropzone'
 import { useState, useCallback } from 'react'
-import type { UploadState } from '@/lib/actions/upload'
 
 interface DropZoneProps {
   onFileSelected: (file: File) => void
@@ -12,7 +11,7 @@ interface DropZoneProps {
 export function DropZone({ onFileSelected, isProcessing }: DropZoneProps) {
   const [error, setError] = useState<string | null>(null)
 
-  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: Array<{ file: File; errors: Array<{ code: string; message: string }> }>) => {
+  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     setError(null)
     if (rejectedFiles.length > 0) {
       const reasons = rejectedFiles.flatMap(r => r.errors.map(e => e.message))

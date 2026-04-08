@@ -38,7 +38,7 @@ export async function generateExteriorRender(
   onProgress?.(10, 'uploading')
 
   const formData = new FormData()
-  formData.append('image', new Blob([imageBuffer], { type: 'image/jpeg' }), 'input.jpg')
+  formData.append('image', new Blob([imageBuffer.subarray(0) as unknown as BlobPart], { type: 'image/jpeg' }), 'input.jpg')
   formData.append('prompt', EXTERIOR_RENDER_PROMPT)
   formData.append('resolution', '1024')
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import type { UploadState } from '@/lib/actions/upload'
+import type { UploadState } from '@/types/upload'
 
 interface ProjectFormProps {
   file: File

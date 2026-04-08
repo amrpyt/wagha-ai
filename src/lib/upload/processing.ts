@@ -10,8 +10,10 @@ async function pdfPageToImage(pdfBuffer: Buffer, pageNum = 1): Promise<Buffer> {
   const page = await pdf.getPage(pageNum)
   const viewport = page.getViewport({ scale: 2 })
   const canvas = new OffscreenCanvas(Math.floor(viewport.width), Math.floor(viewport.height))
-  const ctx = canvas.getContext('2d')!
-  await page.render({ canvasContext: ctx, viewport }).promise
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ctx = canvas.getContext('2d') as any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await page.render({ canvas, viewport } as any).promise
   const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.95 })
   return Buffer.from(await blob.arrayBuffer())
 }
