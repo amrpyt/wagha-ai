@@ -57,7 +57,7 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Setup & Dependencies (Wave 1: npm packages, next.config, directory structure)
+- [x] 02-01-PLAN.md — Setup & Dependencies (Wave 1: npm packages, next.config, directory structure)
 - [ ] 02-02-PLAN.md — Upload & AI Libraries (Wave 2: validation, storage, processing, prompts, client)
 - [ ] 02-03-PLAN.md — Server Action & SSE Route (Wave 3: uploadAndGenerate action, /api/generate SSE endpoint)
 - [ ] 02-04-PLAN.md — Upload UI Components (Wave 4: DropZone, ProjectForm, GenerationProgress, new project page)
