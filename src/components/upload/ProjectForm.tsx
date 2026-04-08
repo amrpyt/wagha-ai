@@ -6,7 +6,7 @@ import type { UploadState } from '@/lib/actions/upload'
 interface ProjectFormProps {
   file: File
   uploadAction: (prevState: UploadState, formData: FormData) => Promise<UploadState>
-  onUploadStart: () => void
+  onUploadStart: (projectId: string) => void
   onError: (error: string) => void
 }
 
@@ -32,7 +32,7 @@ export function ProjectForm({ file, uploadAction, onUploadStart, onError }: Proj
       if (result.error) {
         onError(result.error)
       } else if (result.success && result.projectId) {
-        onUploadStart()
+        onUploadStart(result.projectId)
       }
     })
   }

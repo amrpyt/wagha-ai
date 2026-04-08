@@ -1,8 +1,46 @@
-import Link from 'next/link'
+'use client'
 
-export default async function NewProjectPage() {
-  // For Phase 1, show a simplified placeholder
-  // The actual file upload happens in Phase 2
+import Link from 'next/link'
+import { useState } from 'react'
+import { DropZone } from '@/components/upload/DropZone'
+import { ProjectForm } from '@/components/upload/ProjectForm'
+import { GenerationProgress } from '@/components/upload/GenerationProgress'
+import { uploadAndGenerate } from '@/lib/actions/upload'
+
+type UploadStage = 'select' | 'form' | 'generating'
+
+export default function NewProjectPage() {
+  const [stage, setStage] = useState<UploadStage>('select')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [projectId, setProjectId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleFileSelected = (file: File) => {
+    setSelectedFile(file)
+    setError(null)
+    setStage('form')
+  }
+
+  const handleUploadStart = (id: string) => {
+    setProjectId(id)
+    setStage('generating')
+  }
+
+  const handleUploadError = (err: string) => {
+    setError(err)
+  }
+
+  const handleBack = () => {
+    setSelectedFile(null)
+    setStage('select')
+    setError(null)
+  }
+
+  const handleCancel = () => {
+    setProjectId(null)
+    setStage('form')
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
       {/* Breadcrumb */}
@@ -19,19 +57,48 @@ export default async function NewProjectPage() {
           إنشاء مشروع جديد
         </h1>
 
-        <div className="space-y-4 text-right">
-          <p className="text-gray-600">
-            سيتم إضافة وظيفة رفع الملفات في المرحلة التالية.
-          </p>
-
-          <div className="pt-4 border-t border-gray-200">
-            <Link href="/dashboard">
-              <button className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
-                العودة إلى لوحة التحكم
-              </button>
-            </Link>
+        {stage === 'select' && (
+          <div className="space-y-6">
+            <p className="text-gray-600 text-right">
+              ارفع ملفاً ثم أدخل اسم المشروع لبدء التوليد
+            </p>
+            <DropZone
+              onFileSelected={handleFileSelected}
+              isProcessing={false}
+            />
           </div>
-        </div>
+        )}
+
+        {stage === 'form' && selectedFile && (
+          <div className="space-y-4">
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-700 text-right">{error}</p>
+              </div>
+            )}
+            <ProjectForm
+              file={selectedFile}
+              uploadAction={uploadAndGenerate}
+              onUploadStart={handleUploadStart}
+              onError={handleUploadError}
+            />
+            <button
+              onClick={handleBack}
+              className="w-full py-2 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              العودة
+            </button>
+          </div>
+        )}
+
+        {stage === 'generating' && projectId && (
+          <div className="space-y-6">
+            <GenerationProgress
+              projectId={projectId}
+              onCancel={handleCancel}
+            />
+          </div>
+        )}
       </div>
     </div>
   )
