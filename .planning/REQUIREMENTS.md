@@ -39,16 +39,16 @@
 - [ ] **UPLOAD-02**: User can upload a PDF containing a 2D floor plan
 - [x] **UPLOAD-03**: Uploaded files are validated (magic bytes, MIME type, size limit) before processing
 - [x] **UPLOAD-04**: Files are stored with UUID filenames (not user-provided names)
-- [ ] **UPLOAD-05**: User can enter project name and project number before generating
-- [ ] **UPLOAD-06**: Upload is associated with the logged-in firm (multi-tenant)
+- [x] **UPLOAD-05**: User can enter project name and project number before generating
+- [x] **UPLOAD-06**: Upload is associated with the logged-in firm (multi-tenant)
 
 ### AI Rendering
 
 - [x] **AI-01**: System sends uploaded image to Nano Banana 2 with a pre-built architectural prompt
-- [ ] **AI-02**: System receives a photorealistic 3D exterior render back
-- [ ] **AI-03**: Render generation shows real-time progress feedback (SSE — percentage or status)
-- [ ] **AI-04**: Generation has a 120+ second timeout with clear error if it fails
-- [ ] **AI-05**: User can cancel an in-progress generation
+- [x] **AI-02**: System receives a photorealistic 3D exterior render back
+- [x] **AI-03**: Render generation shows real-time progress feedback (SSE — percentage or status)
+- [x] **AI-04**: Generation has a 120+ second timeout with clear error if it fails
+- [x] **AI-05**: User can cancel an in-progress generation
 - [x] **AI-06**: Pre-built prompt produces architecturally plausible exteriors (realistic style, no facade shown in red)
 - [x] **AI-07**: Rendered image is normalized (CMYK to RGB, 8-bit) before display
 
@@ -127,13 +127,13 @@
 | UPLOAD-02 | Phase 2 | Pending |
 | UPLOAD-03 | Phase 2 | Complete |
 | UPLOAD-04 | Phase 2 | Complete |
-| UPLOAD-05 | Phase 2 | Pending |
-| UPLOAD-06 | Phase 2 | Pending |
+| UPLOAD-05 | Phase 2 | Complete |
+| UPLOAD-06 | Phase 2 | Complete |
 | AI-01 | Phase 2 | Complete |
-| AI-02 | Phase 2 | Pending |
-| AI-03 | Phase 2 | Pending |
-| AI-04 | Phase 2 | Pending |
-| AI-05 | Phase 2 | Pending |
+| AI-02 | Phase 2 | Complete |
+| AI-03 | Phase 2 | Complete |
+| AI-04 | Phase 2 | Complete |
+| AI-05 | Phase 2 | Complete |
 | AI-06 | Phase 2 | Complete |
 | AI-07 | Phase 2 | Complete |
 | DISPLAY-01 | Phase 3 | Pending |
