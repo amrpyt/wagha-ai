@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
           const { readdir } = await import('fs/promises')
           const files = await readdir(uploadsDir)
           // Find any .jpg file (upload action saves as UUID.jpg)
-          const recentJpg = files.find(f => f.endsWith('.jpg'))
+          const recentJpg = files.find(f => f.endsWith('.jpg') || f.endsWith('.jpeg'))
           if (recentJpg) {
             inputBuffer = await readFile(join(uploadsDir, recentJpg))
           }

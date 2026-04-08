@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html dir="rtl" lang="ar">
+    <html dir="rtl" lang="ar" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -23,7 +23,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ThemeProvider attribute="class" enableSystem={true}>
+        <ThemeProvider attribute="class" enableSystem={true} suppressHydrationWarning>
           {children}
         </ThemeProvider>
       </body>
