@@ -8,7 +8,7 @@
 |---|-------|------|--------------|------------------|
 | 1 | SaaS Foundation & Arabic UI | Multi-tenant auth, Paymob, database, Arabic RTL UI | 31 | Firm can signup, subscribe, see dashboard |
 | 2 | Upload & AI Integration | File upload + Nano Banana 2 renders | 13 | Upload → render in <60s with progress feedback |
-| 3 | Result Display & Download | Render visible, downloadable | 5 | Render preview displays, JPG downloads |
+| 3 | Result Display & Download | 3/6 | In Progress|  |
 | 4 | Branded PDF Export | Arabic RTL PDF with firm branding | 7 | PDF opens in Arabic RTL with logo |
 | 5 | Prompt Refinement | Style controls + variations | 3 | Dropdown style selection regenerates |
 
