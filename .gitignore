@@ -28,3 +28,7 @@ vendor/
 coverage/
 .cache/
 tmp/
+.next-env.d.ts
+tsconfig.tsbuildinfo
+python-gemini/
+*.png
