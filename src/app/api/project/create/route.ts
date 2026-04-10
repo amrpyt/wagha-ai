@@ -59,9 +59,23 @@ export async function POST(request: NextRequest) {
 
     // Create project record
     const admin = createAdminClient()
+    type ProjectsInsert = Database['public']['Tables']['projects']['Insert']
     const { data: project, error: projectError } = await admin
       .from('projects')
       .insert({
+        firm_id: firmMember.firm_id,
+        name: projectName,
+        project_number: projectNumber,
+        status: 'processing',
+        created_by: user.id,
+        render_type: renderType,
+        template,
+        modifiers,
+        custom_prompt: customPrompt,
+        input_urls: [inputPath],
+      } as ProjectsInsert)
+      .select('id')
+      .single()
         firm_id: firmMember.firm_id,
         name: projectName,
         project_number: projectNumber,
