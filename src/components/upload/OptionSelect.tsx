@@ -19,7 +19,7 @@ export function OptionSelect({ label, value, options, onChange }: OptionSelectPr
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-right bg-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] cursor-pointer"
+        className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-right text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] cursor-pointer appearance-none"
         dir="rtl"
       >
         <option value="">—</option>

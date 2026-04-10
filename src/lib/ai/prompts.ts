@@ -42,6 +42,147 @@ export interface RenderOptions {
 }
 
 // ============================================================
+// Template → Modifiers mapping
+// Each template pre-fills the left panel with sensible defaults
+// ============================================================
+
+const EXTERIOR_MODIFIERS: Record<ExteriorTemplate, RenderModifiers> = {
+  modern: {
+    cameraAngle: 'eyeLevel',
+    greenery: 'some',
+    vehicles: 'none',
+    people: 'none',
+    streetProps: 'none',
+    timeOfDay: 'goldenHour',
+    weather: 'clear',
+    mood: 'neutral',
+    ground: 'concrete',
+    annotations: false,
+  },
+  classic: {
+    cameraAngle: 'eyeLevel',
+    greenery: 'some',
+    vehicles: 'none',
+    people: 'none',
+    streetProps: 'minimal',
+    timeOfDay: 'goldenHour',
+    weather: 'clear',
+    mood: 'neutral',
+    ground: 'grass',
+    annotations: false,
+  },
+  minimal: {
+    cameraAngle: 'eyeLevel',
+    greenery: 'some',
+    vehicles: 'none',
+    people: 'none',
+    streetProps: 'none',
+    timeOfDay: 'midday',
+    weather: 'clear',
+    mood: 'neutral',
+    ground: 'concrete',
+    annotations: false,
+  },
+  villa: {
+    cameraAngle: 'eyeLevel',
+    greenery: 'lush',
+    vehicles: 'some',
+    people: 'some',
+    streetProps: 'minimal',
+    timeOfDay: 'goldenHour',
+    weather: 'clear',
+    mood: 'vibrant',
+    ground: 'grass',
+    annotations: false,
+  },
+  commercial: {
+    cameraAngle: 'street',
+    greenery: 'none',
+    vehicles: 'some',
+    people: 'some',
+    streetProps: 'urban',
+    timeOfDay: 'midday',
+    weather: 'clear',
+    mood: 'neutral',
+    ground: 'concrete',
+    annotations: false,
+  },
+  landscape: {
+    cameraAngle: 'birdsEye',
+    greenery: 'lush',
+    vehicles: 'none',
+    people: 'none',
+    streetProps: 'none',
+    timeOfDay: 'morning',
+    weather: 'overcast',
+    mood: 'calm',
+    ground: 'grass',
+    annotations: false,
+  },
+}
+
+const INTERIOR_MODIFIERS: Record<InteriorTemplate, RenderModifiers> = {
+  residential: {
+    cameraAngle: 'eyeLevel',
+    greenery: 'none',
+    vehicles: undefined,
+    people: 'none',
+    streetProps: undefined,
+    timeOfDay: 'goldenHour',
+    weather: 'clear',
+    mood: 'calm',
+    ground: 'concrete',
+    annotations: false,
+  },
+  commercial: {
+    cameraAngle: 'eyeLevel',
+    greenery: 'none',
+    vehicles: undefined,
+    people: 'some',
+    streetProps: undefined,
+    timeOfDay: 'midday',
+    weather: 'clear',
+    mood: 'neutral',
+    ground: 'concrete',
+    annotations: false,
+  },
+  office: {
+    cameraAngle: 'eyeLevel',
+    greenery: 'some',
+    vehicles: undefined,
+    people: 'some',
+    streetProps: undefined,
+    timeOfDay: 'midday',
+    weather: 'clear',
+    mood: 'neutral',
+    ground: 'concrete',
+    annotations: false,
+  },
+  retail: {
+    cameraAngle: 'street',
+    greenery: 'none',
+    vehicles: undefined,
+    people: 'some',
+    streetProps: undefined,
+    timeOfDay: 'goldenHour',
+    weather: 'clear',
+    mood: 'vibrant',
+    ground: 'mixed',
+    annotations: false,
+  },
+}
+
+export function getTemplateModifiers(
+  renderType: RenderType,
+  template: ExteriorTemplate | InteriorTemplate
+): RenderModifiers {
+  if (renderType === 'exterior') {
+    return EXTERIOR_MODIFIERS[template as ExteriorTemplate] ?? EXTERIOR_MODIFIERS.modern
+  }
+  return INTERIOR_MODIFIERS[template as InteriorTemplate] ?? INTERIOR_MODIFIERS.residential
+}
+
+// ============================================================
 // Base Prompts — one per render type + template combination
 // ============================================================
 

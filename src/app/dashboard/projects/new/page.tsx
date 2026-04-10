@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, Suspense } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { DropZone } from '@/components/upload/DropZone'
 import { PromptInput } from '@/components/upload/PromptInput'
 import { ReferenceImages } from '@/components/upload/ReferenceImages'
@@ -13,30 +13,28 @@ import { LeftPanel } from '@/components/upload/LeftPanel'
 import { RenderTypeTabs } from '@/components/upload/RenderTypeTabs'
 import { TemplatePills } from '@/components/upload/TemplatePills'
 import type { RenderType, RenderModifiers, ExteriorTemplate, InteriorTemplate } from '@/lib/ai/prompts'
+import { getTemplateModifiers } from '@/lib/ai/prompts'
 
 type GenerationStage = 'idle' | 'uploading' | 'generating' | 'complete' | 'error'
 
-// Default exterior-modern modifiers
-const DEFAULT_MODIFIERS: RenderModifiers = {
-  cameraAngle: 'eyeLevel',
-  greenery: 'some',
-  vehicles: 'none',
-  people: 'none',
-  streetProps: 'none',
-  timeOfDay: 'goldenHour',
-  weather: 'clear',
-  mood: 'neutral',
-  ground: 'concrete',
-  annotations: false,
-}
-
-export default function NewProjectPage() {
+// Inner component that uses useSearchParams — must be wrapped in Suspense
+function NewProjectPageInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   // ── Render configuration state ──────────────────────────────
-  const [renderType, setRenderType] = useState<RenderType>('exterior')
-  const [template, setTemplate] = useState<ExteriorTemplate>('modern')
-  const [modifiers, setModifiers] = useState<RenderModifiers>(DEFAULT_MODIFIERS)
+  // Initialize from URL params if present (for fast-design shortcuts)
+  const initialRenderType: RenderType =
+    (searchParams.get('type') as RenderType) || 'exterior'
+  const initialTemplate = (searchParams.get('template') || 'modern') as ExteriorTemplate | InteriorTemplate
+  const initialModifiers = getTemplateModifiers(
+    initialRenderType,
+    initialTemplate
+  )
+
+  const [renderType, setRenderType] = useState<RenderType>(initialRenderType)
+  const [template, setTemplate] = useState<ExteriorTemplate | InteriorTemplate>(initialTemplate)
+  const [modifiers, setModifiers] = useState<RenderModifiers>(initialModifiers)
   const [customPrompt, setCustomPrompt] = useState('')
 
   // ── File state ─────────────────────────────────────────────
@@ -52,11 +50,20 @@ export default function NewProjectPage() {
   // ── Handlers ────────────────────────────────────────────────
 
   const handleTemplateChange = (t: ExteriorTemplate | InteriorTemplate) => {
-    setTemplate(t as ExteriorTemplate)
+    setTemplate(t)
+    setModifiers(getTemplateModifiers(renderType, t))
   }
 
   const handleModifiersChange = (m: RenderModifiers) => {
     setModifiers(m)
+  }
+
+  const handleRenderTypeChange = (t: RenderType) => {
+    setRenderType(t)
+    // When switching render type, also reset to first template + its default modifiers
+    const firstTemplate: ExteriorTemplate | InteriorTemplate = t === 'exterior' ? 'modern' : 'residential'
+    setTemplate(firstTemplate)
+    setModifiers(getTemplateModifiers(t, firstTemplate))
   }
 
   const handleGenerate = useCallback(async () => {
@@ -161,7 +168,7 @@ export default function NewProjectPage() {
         </div>
 
         {/* Render type tabs */}
-        <RenderTypeTabs value={renderType} onChange={setRenderType} />
+        <RenderTypeTabs value={renderType} onChange={handleRenderTypeChange} />
 
         {/* Template pills */}
         <TemplatePills renderType={renderType} value={template} onChange={handleTemplateChange} />
@@ -272,5 +279,14 @@ export default function NewProjectPage() {
         />
       )}
     </div>
+  )
+}
+
+// Wrap in Suspense so useSearchParams works (Next.js App Router requirement)
+export default function NewProjectPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[calc(100vh-200px)]"><div className="w-8 h-8 border-2 border-[#1E3A5F] border-t-transparent rounded-full animate-spin" /></div>}>
+      <NewProjectPageInner />
+    </Suspense>
   )
 }
