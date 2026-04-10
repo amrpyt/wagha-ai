@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation'
 interface GenerationProgressProps {
   projectId: string
   onCancel: () => void
+  /** When true, calls onComplete(renderUrl) instead of redirecting to project page */
+  inlineMode?: boolean
+  onComplete?: (renderUrl: string) => void
 }
 
 interface ProgressData {
@@ -15,7 +18,12 @@ interface ProgressData {
   renderUrl?: string
 }
 
-export function GenerationProgress({ projectId, onCancel }: GenerationProgressProps) {
+export function GenerationProgress({
+  projectId,
+  onCancel,
+  inlineMode = false,
+  onComplete,
+}: GenerationProgressProps) {
   const eventSourceRef = useRef<EventSource | null>(null)
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState('جاري البدء...')
@@ -46,10 +54,14 @@ export function GenerationProgress({ projectId, onCancel }: GenerationProgressPr
       if (data.renderUrl) {
         setRenderUrl(data.renderUrl)
         eventSourceRef.current?.close()
-        // Redirect to project page after short delay
-        setTimeout(() => {
-          router.push(`/dashboard/projects/${projectId}`)
-        }, 1500)
+        if (inlineMode && onComplete) {
+          onComplete(data.renderUrl)
+        } else {
+          // Redirect to project page after short delay
+          setTimeout(() => {
+            router.push(`/dashboard/projects/${projectId}`)
+          }, 1500)
+        }
       }
     }
 

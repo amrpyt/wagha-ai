@@ -46,6 +46,38 @@ export type Project = {
   created_by: string | null
   created_at: string
   updated_at: string
+  render_type?: 'exterior' | 'interior'
+  template?: string
+  modifiers?: Json
+  custom_prompt?: string | null
+  input_urls?: string[] | null
+  reference_urls?: string[] | null
+}
+
+export type GenerationHistory = {
+  id: string
+  project_id: string
+  render_url: string
+  input_url: string
+  render_type: 'exterior' | 'interior'
+  template: string
+  modifiers: Json
+  custom_prompt: string | null
+  created_by: string | null
+  created_at: string
+}
+
+export type RenderPreset = {
+  id: string
+  firm_id: string
+  name: string
+  thumbnail_url: string | null
+  render_type: 'exterior' | 'interior'
+  template: string
+  modifiers: Json
+  custom_prompt: string | null
+  created_by: string | null
+  created_at: string
 }
 
 export type Subscription = {
@@ -119,6 +151,16 @@ export type Database = {
         Row: PendingOrder
         Insert: Omit<PendingOrder, 'id' | 'created_at'>
         Update: Partial<Omit<PendingOrder, 'id'>>
+      }
+      generation_history: {
+        Row: GenerationHistory
+        Insert: Omit<GenerationHistory, 'id' | 'created_at'>
+        Update: Partial<Omit<GenerationHistory, 'id'>>
+      }
+      render_presets: {
+        Row: RenderPreset
+        Insert: Omit<RenderPreset, 'id' | 'created_at'>
+        Update: Partial<Omit<RenderPreset, 'id'>>
       }
     }
   }

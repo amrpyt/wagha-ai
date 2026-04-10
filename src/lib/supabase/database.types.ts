@@ -266,6 +266,53 @@ export type Database = {
           },
         ]
       }
+      generation_history: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          custom_prompt: string | null
+          id: string
+          input_url: string
+          modifiers: Json | null
+          project_id: string
+          render_type: string
+          render_url: string
+          template: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          custom_prompt?: string | null
+          id?: string
+          input_url: string
+          modifiers?: Json | null
+          project_id: string
+          render_type: string
+          render_url: string
+          template: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          custom_prompt?: string | null
+          id?: string
+          input_url?: string
+          modifiers?: Json | null
+          project_id?: string
+          render_type?: string
+          render_url?: string
+          template?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_history_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       render_presets: {
         Row: {
           created_at: string | null

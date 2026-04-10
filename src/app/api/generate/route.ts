@@ -5,6 +5,7 @@ import { buildPrompt, type RenderOptions } from '@/lib/ai/prompts'
 import { saveUploadedFile } from '@/lib/upload/storage'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+import type { Json } from '@/lib/supabase/database.types'
 
 // In-memory progress store for SSE polling
 const progressStore = new Map<string, {
@@ -153,7 +154,25 @@ export async function GET(request: NextRequest) {
         // Save render to /uploads/
         const { filename: renderFilename, path: renderPath } = await saveUploadedFile(renderBuffer, 'image/jpeg')
 
-        // Update project record
+        // Get input URL for generation_history
+        const inputUrlsForHistory = (project.input_urls || []) as string[]
+        const inputUrl = inputUrlsForHistory[0] || ''
+
+        // Save generation to history table
+        await admin
+          .from('generation_history')
+          .insert({
+            project_id: projectId,
+            render_url: renderPath,
+            input_url: inputUrl,
+            render_type: (project.render_type as 'exterior' | 'interior') || 'exterior',
+            template: (project.template as string) || 'modern',
+            modifiers: (project.modifiers as Json) || {},
+            custom_prompt: project.custom_prompt || null,
+            created_by: (project as { created_by?: string }).created_by || null,
+          })
+
+        // Update project record with latest render
         await admin
           .from('projects')
           .update({ status: 'complete', render_url: renderPath })
