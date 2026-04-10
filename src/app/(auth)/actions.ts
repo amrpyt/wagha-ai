@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
@@ -48,35 +49,36 @@ export async function signUp(prevState: AuthState, formData: FormData) {
     return { error: 'فشل إنشاء الحساب' }
   }
 
-  // Create firm record (user is the owner)
-  const { error: firmError } = await supabase
-    .from('firms')
-    .insert({
-      name: firmName,
-      owner_id: authData.user.id,
-      brand_color: '#1E3A5F',
-    })
+  // Create firm record using admin client (bypasses RLS - user has no session yet after signup)
+  // Note: Requires SUPABASE_SERVICE_ROLE_KEY in env
+  let firmId: string | null = null
+  try {
+    const admin = createAdminClient()
+    const { data: firm, error: firmError } = await admin
+      .from('firms')
+      .insert({
+        name: firmName,
+        owner_id: authData.user.id,
+        brand_color: '#1E3A5F',
+      })
+      .select('id')
+      .single()
 
-  if (firmError) {
-    // Rollback: delete auth user
-    await supabase.auth.admin.deleteUser(authData.user.id)
-    return { error: 'فشل إنشاء الشركة' }
-  }
+    if (firmError) {
+      await admin.auth.admin.deleteUser(authData.user.id)
+      return { error: 'فشل إنشاء الشركة' }
+    }
+    firmId = firm?.id ?? null
 
-  // Get the firm we just created
-  const { data: firm } = await supabase
-    .from('firms')
-    .select('id')
-    .eq('owner_id', authData.user.id)
-    .single()
-
-  if (firm) {
     // Add user as admin firm_member
-    await supabase.from('firm_members').insert({
-      firm_id: firm.id,
+    await admin.from('firm_members').insert({
+      firm_id: firmId,
       user_id: authData.user.id,
       role: 'admin',
     })
+  } catch (err) {
+    console.error('Signup firm creation error:', err)
+    return { error: 'فشل إنشاء الشركة' }
   }
 
   // Supabase sends verification email automatically

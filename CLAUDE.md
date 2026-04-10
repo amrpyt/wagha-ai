@@ -124,6 +124,27 @@ Use these entry points:
 Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
 <!-- GSD:workflow-end -->
 
+<!-- GSD:browser-automation-start -->
+## Browser Automation
+
+Use the Playwright MCP (`plugin:playwright`) for browser automation — opening pages, clicking elements, filling forms, taking snapshots, and evaluating JavaScript.
+
+Core workflow:
+1. `browser_navigate` — Navigate to a URL
+2. `browser_snapshot` — Get interactive elements with refs (@e1, @e2)
+3. `browser_click @e1` / `browser_fill` / `browser_type` — Interact using refs
+4. Re-snapshot after page changes to get fresh refs
+
+Key capabilities:
+- `browser_evaluate` — Run arbitrary JS and inspect DOM state
+- `browser_take_screenshot` — Visual verification
+- `browser_network_requests` — Inspect API calls
+- `browser_console_messages` — Check for console errors
+- `browser_wait_for` — Wait for text/element to appear
+
+For headless browser testing at a URL: use the `agent-browser` tool.
+<!-- GSD:browser-automation-end -->
+
 
 
 <!-- GSD:profile-start -->

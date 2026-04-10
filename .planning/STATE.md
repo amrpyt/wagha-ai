@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Executing Phase 02
-last_updated: "2026-04-08T09:41:09.865Z"
+last_updated: "2026-04-09"
 progress:
   total_phases: 5
   completed_phases: 1
@@ -13,11 +13,17 @@ progress:
 
 # State: Wagha-ai
 
-**Last updated:** 2026-03-29 after SaaS scope expansion
+**Last updated:** 2026-04-09 after Gemini API wire-up
+
+## Quick Tasks Completed
+
+| # | Task | Completed |
+|---|------|-----------|
+| 1 | Gemini API client wire-up | 2026-04-09 |
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-29)
+See: .planning/PROJECT.md
 
 **Core value:** Architecture firms subscribe → upload a 2D plan → get a branded PDF render in under 60 seconds → send to their client.
 
@@ -40,6 +46,7 @@ See: .planning/PROJECT.md (updated 2026-03-29)
 | 11 | Dashboard | Folder-based, all team see all |
 | 12 | Team access | All members see all projects |
 | 13 | Billing | Paymob (Egyptian payment gateway) |
+| 14 | AI API | Gemini `gemini-3.1-flash-image-preview` via `generativelanguage.googleapis.com` |
 
 ## Session
 
@@ -91,19 +98,16 @@ See: .planning/PROJECT.md (updated 2026-03-29)
 
 | Area | Decision Needed | Blocking |
 |------|-----------------|----------|
-| Nano Banana 2 API | Exact endpoint, auth method, rate limits, response format | Phase 2 |
 | Paymob integration | How to integrate Paymob subscription API with Next.js | Phase 1 |
-| Database | ~~SQLite vs PostgreSQL~~ | ✓ Decided: PostgreSQL via Supabase |
-| Hosting | ~~Vercel, Railway, or other~~ | ✓ Decided: Vercel + Supabase |
 | Noor-UI integration | How to integrate RTL components with Next.js | Phase 1 |
 
 ## Notes
 
+- 2026-04-09: Gemini API client wired — real endpoint, JSON+base64, proper response parsing.
+- 2026-04-08: Phase 02 UAT all 4 tests passing. Upload flow E2E verified.
+- 2026-04-08: PDF processing disabled — pdfjs-dist crashes Node.js due to DOMMatrix. PDF path throws clear error message instead.
 - 2026-03-29: Project initialized. Research complete. Roadmap revised for SaaS multi-tenant.
 - Business model: self-serve SaaS with Paymob subscriptions (Stripe not available in Egypt).
 - First customer: architecture firm leader who wants this for their firm.
 - Building multi-tenant from day 1 (not retrofitting later).
-- pdfmake-rtl for Arabic RTL PDF (not @react-pdf/renderer).
-- Noor-UI RTL component library to be used for standard UI elements.
-- 2026-03-29: Phase 1 context gathered. All infrastructure/billing/dashboard decisions locked.
 - Billing: Paymob (not Stripe — Stripe not available in Egypt).

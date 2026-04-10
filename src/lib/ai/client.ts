@@ -1,7 +1,6 @@
 import { EXTERIOR_RENDER_PROMPT } from './prompts'
 
-const NANOBANANA_API_URL = process.env.NANOBANANA_API_URL || 'https://api.nanobanana.example/v1/exterior'
-const NANOBANANA_API_KEY = process.env.NANOBANANA_API_KEY || ''
+const PYTHON_GEMINI_URL = process.env.PYTHON_GEMINI_URL || 'http://localhost:8000'
 const TIMEOUT_MS = 120_000
 
 interface GenerationOptions {
@@ -35,12 +34,13 @@ export async function generateExteriorRender(
 ): Promise<Buffer> {
   const { imageBuffer, signal, onProgress } = options
 
+  if (!PYTHON_GEMINI_URL) {
+    throw new Error('PYTHON_GEMINI_URL environment variable is not set')
+  }
+
   onProgress?.(10, 'uploading')
 
-  const formData = new FormData()
-  formData.append('image', new Blob([imageBuffer.subarray(0) as unknown as BlobPart], { type: 'image/jpeg' }), 'input.jpg')
-  formData.append('prompt', EXTERIOR_RENDER_PROMPT)
-  formData.append('resolution', '1024')
+  const base64Image = imageBuffer.toString('base64')
 
   onProgress?.(25, 'generating')
 
@@ -49,23 +49,26 @@ export async function generateExteriorRender(
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS)
 
-      // If caller passed a signal, wire it to our controller
       if (signal) {
         signal.addEventListener('abort', () => controller.abort())
       }
 
       try {
-        const res = await fetch(NANOBANANA_API_URL, {
+        const res = await fetch(`${PYTHON_GEMINI_URL}/generate`, {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${NANOBANANA_API_KEY}` },
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: EXTERIOR_RENDER_PROMPT,
+            image_base64: base64Image,
+          }),
           signal: controller.signal,
         })
         clearTimeout(timeoutId)
 
         if (!res.ok) {
           if (res.status === 429) throw new Error('429: Rate limit exceeded')
-          throw new Error(`API error: ${res.status} ${res.statusText}`)
+          const text = await res.text()
+          throw new Error(`API error ${res.status} ${res.statusText}: ${text}`)
         }
         return res
       } catch (e) {
@@ -78,8 +81,8 @@ export async function generateExteriorRender(
 
   onProgress?.(75, 'processing')
 
-  const arrayBuffer = await response.arrayBuffer()
-  const resultBuffer = Buffer.from(arrayBuffer)
+  const json = await response.json()
+  const resultBuffer = Buffer.from(json.image_base64, 'base64')
 
   onProgress?.(100, 'complete')
   return resultBuffer
