@@ -70,4 +70,4 @@ Architecture firms subscribe → upload a 2D plan → get a branded PDF render i
 
 ---
 
-*Last updated: 2026-03-29 after initialization (updated SaaS scope: multi-tenant, Stripe, dashboard)*
+*Last updated: 2026-04-10 after Phase 03 completion (mini-apps hub live at /apps/)*
