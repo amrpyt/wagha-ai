@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wagha-ai — تتبع المراحل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #242836;
+      --border: #2e3347;
+      --text: #e8eaf0;
+      --text-dim: #8b90a0;
+      --accent: #3b82f6;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --purple: #a855f7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans Arabic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+      direction: rtl;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b82f6, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    .overall-bar {
+      max-width: 800px;
+      margin: 0 auto 3rem;
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      border: 1px solid var(--border);
+    }
+
+    .overall-bar .label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    .bar-track {
+      height: 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--accent), var(--purple));
+      transition: width 0.6s ease;
+    }
+
+    .phases {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .phase-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .phase-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .phase-num {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .phase-num.done { background: var(--green); color: #000; }
+    .phase-num.active { background: var(--accent); color: #fff; }
+    .phase-num.pending { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+
+    .phase-info { flex: 1; min-width: 0; }
+    .phase-info h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .phase-info p { color: var(--text-dim); font-size: 0.9rem; }
+
+    .phase-stats {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .phase-stats span { display: flex; align-items: center; gap: 0.3rem; }
+
+    .phase-body { display: none; padding: 0 1.5rem 1.5rem; border-top: 1px solid var(--border); }
+
+    .phase-card.open > .phase-body { display: block; }
+
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+
+    .plan-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface2);
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+
+    .plan-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+    }
+
+    .plan-check.done { background: var(--green); color: #000; }
+    .plan-check.pending { background: var(--surface); border: 1px solid var(--border); }
+
+    .tests-section {
+      margin-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+    }
+
+    .tests-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .tests-header h3 { font-size: 1rem; font-weight: 600; }
+    .test-pills { display: flex; gap: 0.5rem; }
+
+    .pill {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .pill-pass { background: rgba(34,197,94,0.15); color: var(--green); }
+    .pill-fail { background: rgba(239,68,68,0.15); color: var(--red); }
+    .pill-block { background: rgba(245,158,11,0.15); color: var(--amber); }
+
+    .test-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .test-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 1rem;
+      background: var(--surface2);
+      border-radius: 8px;
+      font-size: 0.88rem;
+    }
+
+    .test-icon { font-size: 0.9rem; flex-shrink: 0; width: 20px; text-align: center; }
+
+    .expand-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+      font-size: 1.2rem;
+    }
+
+    .expand-btn:hover { background: var(--surface2); }
+
+    .legend {
+      max-width: 900px;
+      margin: 2rem auto 0;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .legend-item { display: flex; align-items: center; gap: 0.5rem; }
+
+    .chevron { transition: transform 0.2s; display: inline-block; }
+    .phase-card.open .chevron { transform: rotate(180deg); }
+
+    .milestone-badge {
+      display: inline-block;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.75rem;
+    }
+
+    .milestone-badge.done { background: rgba(34,197,94,0.15); color: var(--green); }
+    .milestone-badge.active { background: rgba(59,130,246,0.15); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Wagha-ai</h1>
+  <p>تتبع مراحل البناء — من الرؤية إلى المنتج</p>
+</div>
+
+<div class="overall-bar">
+  <div class="label">
+    <span>التقدم الإجمالي</span>
+    <span id="overall-pct">1/5 مراحل</span>
+  </div>
+  <div class="bar-track">
+    <div class="bar-fill" id="overall-fill" style="width: 20%"></div>
+  </div>
+</div>
+
+<div class="phases" id="phases"></div>
+
+<div class="legend">
+  <div class="legend-item"><div style="width:12px;height:12px;border-radius:50%;background:var(--green)"></div> مكتمل</div>
+  <div class="legend-item"><div style="width:12px;height:12px;border-radius:50%;background:var(--accent)"></div> قيد التنفيذ</div>
+  <div class="legend-item"><div style="width:12px;height:12px;border-radius:50%;background:var(--surface2);border:1px solid var(--border)"></div> بانتظار البدء</div>
+</div>
+
+<script>
+const phases = [
+  {
+    num: 1,
+    name: "أساسيات SaaS وواجهة Arabic RTL",
+    nameEn: "SaaS Foundation & Arabic UI",
+    goal: "البنية التحتية، المصادقة، الفوترة، واجهة RTL عربية",
+    plans: ["01-01 البنية التحتية","01-02 تدفقات المصادقة","01-03 لوحة التحكم والمشاريع","01-04 الإعدادات والفريق","01-05 الفوترة والاشتراكات"],
+    donePlans: 5,
+    totalPlans: 5,
+    status: "done",
+    tests: [
+      { name: "التسجيل بالبريد الإلكتروني", result: "pass" },
+      { name: "تسجيل الدخول وجلسة مستمرة", result: "pass" },
+      { name: "دعوة عضو فريق", result: "pass" },
+      { name: "عزل بيانات المستأجرين", result: "pending" },
+      { name: "صفحة الأسعار — 3 خطط", result: "pass" },
+      { name: "render مجاني عند التسجيل", result: "pending" },
+      { name: "طلب الترقية بعد الاستخدام المجاني", result: "pending" },
+      { name: "دفع Paymob يفتح", result: "pending" },
+      { name: "عرض الرصيد وإلغاء الاشتراك", result: "pending" },
+      { name: "لوحة التحكم تعرض المشاريع", result: "pending" },
+      { name: "إعدادات الشركة", result: "pass" },
+      { name: "واجهة RTL عربية", result: "pass" },
+      { name: "إعدادات الحساب", result: "pass" }
+    ]
+  },
+  {
+    num: 2,
+    name: "رفع الملفات والتكامل مع AI",
+    nameEn: "Upload & AI Integration",
+    goal: "رفع آمن + توليد renders عبر Nano Banana 2",
+    plans: ["02-01 التثبيت","02-02 مكتبات الرفع وAI","02-03 Server Action وSSE","02-04 واجهة الرفع"],
+    donePlans: 4,
+    totalPlans: 4,
+    status: "active",
+    tests: [
+      { name: "تدفق SSE من البداية للنهاية", result: "pass" },
+      { name: "تدفق الرفع الكامل في المتصفح", result: "pass" },
+      { name: "إلغاء التوليد", result: "pass" },
+      { name: "عرض الأخطاء + retry", result: "pass" }
+    ]
+  },
+  {
+    num: 3,
+    name: "عرض النتيجة والتحميل",
+    nameEn: "Result Display & Download",
+    goal: "عرض الـ render والتحميل كـ JPG",
+    plans: ["03-01 عرض النتيجة","03-02 تحميل JPG"],
+    donePlans: 0,
+    totalPlans: 2,
+    status: "pending",
+    tests: []
+  },
+  {
+    num: 4,
+    name: "تصدير PDF بالعلامة التجارية",
+    nameEn: "Branded PDF Export",
+    goal: "PDF احترافي بالعربية RTL مع شعار الشركة",
+    plans: ["04-01 إنشاء PDF","04-02 تخطيط RTL","04-03 تضمين الشعار","04-04 التحميل"],
+    donePlans: 0,
+    totalPlans: 4,
+    status: "pending",
+    tests: []
+  },
+  {
+    num: 5,
+    name: "تحسين Prompt",
+    nameEn: "Prompt Refinement",
+    goal: "تحكم في النمط — حداثة/تقليدي/بحر متوسط",
+    plans: ["05-01 اختيارات النمط","05-02 إعادة التوليد","05-03 تطبيق الأنماط"],
+    donePlans: 0,
+    totalPlans: 3,
+    status: "pending",
+    tests: []
+  }
+];
+
+function renderTests(tests) {
+  if (!tests.length) return '<div style="color:var(--text-dim);font-size:0.9rem">لم تُختبر بعد</div>';
+  const pass = tests.filter(t => t.result === 'pass').length;
+  const fail = tests.filter(t => t.result === 'fail').length;
+  const block = tests.filter(t => t.result === 'pending').length;
+  let html = `<div class="tests-header">
+    <h3>اختبارات UAT</h3>
+    <div class="test-pills">
+      ${pass ? `<span class="pill pill-pass">✓ ${pass} نجاح</span>` : ''}
+      ${fail ? `<span class="pill pill-fail">✗ ${fail} فشل</span>` : ''}
+      ${block ? `<span class="pill pill-block">⏳ ${block} بانتظار</span>` : ''}
+    </div>
+  </div>
+  <div class="test-list">`;
+  tests.forEach(t => {
+    const icons = { pass: '✓', fail: '✗', pending: '⏳' };
+    const colors = { pass: 'var(--green)', fail: 'var(--red)', pending: 'var(--amber)' };
+    html += `<div class="test-item">
+      <span class="test-icon" style="color:${colors[t.result]}">${icons[t.result]}</span>
+      <span>${t.name}</span>
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderPhase(p) {
+  const statusIcon = { done: '✓', active: '◐', pending: '○' };
+  const planCheck = p.plans.map((name, i) => {
+    const done = i < p.donePlans;
+    return `<div class="plan-item">
+      <div class="plan-check ${done ? 'done' : 'pending'}">${done ? '✓' : ''}</div>
+      <span>${name}</span>
+    </div>`;
+  }).join('');
+
+  return `<div class="phase-card ${p.status === 'active' ? 'open' : ''}" data-phase="${p.num}">
+  <div class="phase-header" onclick="togglePhase(${p.num})">
+    <div class="phase-num ${p.status}">${statusIcon[p.status]}</div>
+    <div class="phase-info">
+      <h2>${p.num}. ${p.name}</h2>
+      <p>${p.goal}</p>
+    </div>
+    <div class="phase-stats">
+      <span>📋 ${p.donePlans}/${p.totalPlans}</span>
+    </div>
+    <button class="expand-btn"><span class="chevron">▾</span></button>
+  </div>
+  <div class="phase-body">
+    <div class="plans-grid">${planCheck}</div>
+    <div class="tests-section">${renderTests(p.tests)}</div>
+  </div>
+</div>`;
+}
+
+function togglePhase(num) {
+  const card = document.querySelector(`[data-phase="${num}"]`);
+  card.classList.toggle('open');
+}
+
+const container = document.getElementById('phases');
+container.innerHTML = phases.map(renderPhase).join('');
+
+const doneCount = phases.filter(p => p.status === 'done').length;
+const pct = Math.round(((doneCount) / phases.length) * 100);
+document.getElementById('overall-pct').textContent = `${doneCount}/${phases.length} مراحل مكتملة (${pct}%)`;
+document.getElementById('overall-fill').style.width = pct + '%';
+</script>
+
+</body>
+</html>
