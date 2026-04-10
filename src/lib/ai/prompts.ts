@@ -17,6 +17,22 @@ export type Weather = 'clear' | 'overcast' | 'rain'
 export type Mood = 'neutral' | 'vibrant' | 'calm' | 'dramatic'
 export type Ground = 'concrete' | 'grass' | 'mixed'
 
+// Interior-specific modifier types (D-07)
+export type RoomType = 'living' | 'bedroom' | 'kitchen' | 'bathroom' | 'office' | 'retail'
+export type FurnitureStyle = 'modern' | 'classic' | 'minimalist' | 'traditional'
+export type ColorPalette = 'warm' | 'cool' | 'neutral' | 'bold'
+export type LightingMood = 'natural' | 'artificial' | 'moody'
+export type DecorStyle = 'minimalist' | 'maximalist' | 'industrial' | 'scandinavian'
+
+// Interior modifiers type — used by InteriorLeftPanel and interior app page
+export interface InteriorModifiers {
+  roomType?: RoomType
+  furnitureStyle?: FurnitureStyle
+  colorPalette?: ColorPalette
+  lightingMood?: LightingMood
+  decorStyle?: DecorStyle
+}
+
 export interface RenderModifiers {
   cameraAngle?: CameraAngle
   greenery?: Greenery
@@ -28,6 +44,12 @@ export interface RenderModifiers {
   mood?: Mood
   ground?: Ground
   annotations?: boolean
+  // Interior options (optional, only used when renderType='interior')
+  roomType?: RoomType
+  furnitureStyle?: FurnitureStyle
+  colorPalette?: ColorPalette
+  lightingMood?: LightingMood
+  decorStyle?: DecorStyle
 }
 
 export interface RenderOptions {
@@ -123,52 +145,32 @@ const EXTERIOR_MODIFIERS: Record<ExteriorTemplate, RenderModifiers> = {
 
 const INTERIOR_MODIFIERS: Record<InteriorTemplate, RenderModifiers> = {
   residential: {
-    cameraAngle: 'eyeLevel',
-    greenery: 'none',
-    vehicles: undefined,
-    people: 'none',
-    streetProps: undefined,
-    timeOfDay: 'goldenHour',
-    weather: 'clear',
-    mood: 'calm',
-    ground: 'concrete',
-    annotations: false,
+    roomType: 'living',
+    furnitureStyle: 'modern',
+    colorPalette: 'warm',
+    lightingMood: 'natural',
+    decorStyle: 'minimalist',
   },
   commercial: {
-    cameraAngle: 'eyeLevel',
-    greenery: 'none',
-    vehicles: undefined,
-    people: 'some',
-    streetProps: undefined,
-    timeOfDay: 'midday',
-    weather: 'clear',
-    mood: 'neutral',
-    ground: 'concrete',
-    annotations: false,
+    roomType: 'retail',
+    furnitureStyle: 'classic',
+    colorPalette: 'neutral',
+    lightingMood: 'artificial',
+    decorStyle: 'maximalist',
   },
   office: {
-    cameraAngle: 'eyeLevel',
-    greenery: 'some',
-    vehicles: undefined,
-    people: 'some',
-    streetProps: undefined,
-    timeOfDay: 'midday',
-    weather: 'clear',
-    mood: 'neutral',
-    ground: 'concrete',
-    annotations: false,
+    roomType: 'office',
+    furnitureStyle: 'minimalist',
+    colorPalette: 'cool',
+    lightingMood: 'artificial',
+    decorStyle: 'minimalist',
   },
   retail: {
-    cameraAngle: 'street',
-    greenery: 'none',
-    vehicles: undefined,
-    people: 'some',
-    streetProps: undefined,
-    timeOfDay: 'goldenHour',
-    weather: 'clear',
-    mood: 'vibrant',
-    ground: 'mixed',
-    annotations: false,
+    roomType: 'retail',
+    furnitureStyle: 'modern',
+    colorPalette: 'bold',
+    lightingMood: 'moody',
+    decorStyle: 'industrial',
   },
 }
 
@@ -251,6 +253,38 @@ export const MODIFIER_LABELS: Record<string, string> = {
   mixed: 'مختلط',
   minimal: 'بسيط',
   urban: 'حضري',
+
+  // Interior
+  roomType: 'نوع الغرفة',
+  furnitureStyle: 'أسلوب الأثاث',
+  colorPalette: 'لوحة الألوان',
+  lightingMood: 'مزاج الإضاءة',
+  decorStyle: 'أسلوب الديكور',
+  // Room type values
+  living: 'صالة معيشة',
+  bedroom: 'غرفة نوم',
+  kitchen: 'مطبخ',
+  bathroom: 'حمام',
+  office: 'مكتب',
+  retail: 'متجر',
+  // Furniture style values
+  modern: 'حديث',
+  classic: 'كلاسيكي',
+  minimalist: 'مينيمال',
+  traditional: 'تقليدي',
+  // Color palette values
+  warm: 'دافئ',
+  cool: 'بارد',
+  neutral: 'محايد',
+  bold: 'جريء',
+  // Lighting mood values
+  natural: 'طبيعي',
+  artificial: 'صناعي',
+  moody: 'خافت',
+  // Decor style values
+  maximalist: 'غني',
+  industrial: 'صناعي',
+  scandinavian: 'اسكندنافي',
 }
 
 export const MODIFIERS = {
@@ -312,6 +346,43 @@ export const MODIFIERS = {
   annotations: {
     true: 'Include numbered callout annotations with arrows pointing to key architectural features, labels in Arabic.',
     false: 'Clean render with no annotations, labels, or text overlays.',
+  },
+
+  // Interior modifiers (D-07)
+  roomType: {
+    living: 'Open-plan living room interior with comfortable seating and natural light.',
+    bedroom: 'Cozy bedroom interior with bed, nightstands, and soft lighting.',
+    kitchen: 'Modern kitchen interior with island, appliances, and functional layout.',
+    bathroom: 'Contemporary bathroom interior with fixtures, tiles, and ambient lighting.',
+    office: 'Professional home office interior with desk, shelving, and work setup.',
+    retail: 'Retail store interior with display shelves, checkout area, and product displays.',
+  },
+
+  furnitureStyle: {
+    modern: 'Modern contemporary furniture, clean lines, minimal ornamentation.',
+    classic: 'Classic traditional furniture with ornate details, warm wood tones.',
+    minimalist: 'Minimalist furniture with simple forms, neutral colors.',
+    traditional: 'Traditional furniture with rich fabrics and classic silhouettes.',
+  },
+
+  colorPalette: {
+    warm: 'Warm color palette with beiges, terracotta, warm woods, and amber tones.',
+    cool: 'Cool color palette with blues, grays, silvers, and green undertones.',
+    neutral: 'Neutral palette with whites, grays, natural woods, and soft beiges.',
+    bold: 'Bold accent colors with saturated tones, dramatic contrasts.',
+  },
+
+  lightingMood: {
+    natural: 'Natural daylight streaming through windows, bright and airy atmosphere.',
+    artificial: 'Artificial LED lighting with warm or neutral color temperature.',
+    moody: 'Moody low lighting, ambient atmosphere with dramatic shadows.',
+  },
+
+  decorStyle: {
+    minimalist: 'Minimalist decor with few accessories, clean surfaces, uncluttered.',
+    maximalist: 'Maximalist decor with rich textures, layers, and abundant accessories.',
+    industrial: 'Industrial style with exposed materials, metal accents, raw finishes.',
+    scandinavian: 'Scandinavian design with light woods, whites, and functional simplicity.',
   },
 }
 
@@ -376,6 +447,30 @@ export function buildPrompt(options: RenderOptions): string {
 
   if (modifiers.annotations !== undefined) {
     parts.push(MODIFIERS.annotations[String(modifiers.annotations) as 'true' | 'false'])
+  }
+
+  // Interior modifiers (only applied when renderType='interior')
+  if (renderType === 'interior') {
+    if (modifiers.roomType) {
+      const val = MODIFIERS.roomType[modifiers.roomType as RoomType]
+      if (val) parts.push(val)
+    }
+    if (modifiers.furnitureStyle) {
+      const val = MODIFIERS.furnitureStyle[modifiers.furnitureStyle as FurnitureStyle]
+      if (val) parts.push(val)
+    }
+    if (modifiers.colorPalette) {
+      const val = MODIFIERS.colorPalette[modifiers.colorPalette as ColorPalette]
+      if (val) parts.push(val)
+    }
+    if (modifiers.lightingMood) {
+      const val = MODIFIERS.lightingMood[modifiers.lightingMood as LightingMood]
+      if (val) parts.push(val)
+    }
+    if (modifiers.decorStyle) {
+      const val = MODIFIERS.decorStyle[modifiers.decorStyle as DecorStyle]
+      if (val) parts.push(val)
+    }
   }
 
   // Reference images — reference style from extra images, keep design from main image
