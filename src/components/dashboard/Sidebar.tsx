@@ -14,37 +14,37 @@ interface SidebarProps {
 const FAST_DESIGNS = [
   {
     label: 'خارجي - حديث',
-    href: '/dashboard/projects/new?type=exterior&template=modern',
+    href: '/apps/2d-to-3d?template=modern',
     icon: '🏠',
   },
   {
     label: 'خارجي - كلاسيكي',
-    href: '/dashboard/projects/new?type=exterior&template=classic',
+    href: '/apps/2d-to-3d?template=classic',
     icon: '🏛️',
   },
   {
     label: 'خارجي - مينيمال',
-    href: '/dashboard/projects/new?type=exterior&template=minimal',
+    href: '/apps/2d-to-3d?template=minimal',
     icon: '⬜',
   },
   {
     label: 'خارجي - فيلا',
-    href: '/dashboard/projects/new?type=exterior&template=villa',
+    href: '/apps/2d-to-3d?template=villa',
     icon: '🏡',
   },
   {
     label: 'خارجي - تجاري',
-    href: '/dashboard/projects/new?type=exterior&template=commercial',
+    href: '/apps/2d-to-3d?template=commercial',
     icon: '🏢',
   },
   {
     label: 'داخلي - سكني',
-    href: '/dashboard/projects/new?type=interior&template=residential',
+    href: '/apps/interior?template=residential',
     icon: '🏠',
   },
   {
     label: 'داخلي - مكتبي',
-    href: '/dashboard/projects/new?type=interior&template=office',
+    href: '/apps/interior?template=office',
     icon: '💼',
   },
 ]
@@ -151,6 +151,52 @@ export function Sidebar({ firmName, brandColor, userName }: SidebarProps) {
               <span className="text-sm text-right">{item.label}</span>
             </Link>
           ))}
+        </div>
+
+        {/* Apps Section */}
+        <div className="pt-4 mt-4 border-t border-gray-200 space-y-1">
+          <p className="text-xs text-gray-400 px-3 pb-2 text-right">
+            التطبيقات
+          </p>
+
+          {/* 2D to 3D */}
+          <Link
+            href="/apps/2d-to-3d"
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors w-full ${
+              pathname === '/apps/2d-to-3d'
+                ? ''
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <span className="text-base">🏠</span>
+            <span className="text-sm text-right">2D إلى 3D</span>
+          </Link>
+
+          {/* Interior */}
+          <Link
+            href="/apps/interior"
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors w-full ${
+              pathname === '/apps/interior'
+                ? ''
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <span className="text-base">🛋️</span>
+            <span className="text-sm text-right">تصميم داخلي</span>
+          </Link>
+
+          {/* Suggestions */}
+          <Link
+            href="/apps/suggestions"
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors w-full ${
+              pathname === '/apps/suggestions'
+                ? ''
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <span className="text-base">✨</span>
+            <span className="text-sm text-right">اقتراحات ذكية</span>
+          </Link>
         </div>
 
         {/* Settings */}
