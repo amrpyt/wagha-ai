@@ -64,8 +64,9 @@ export async function GET(request: NextRequest) {
 
         // Read input image from project record's input_urls (first entry)
         const inputUrls = (project.input_urls || []) as string[]
+        // Strip leading "/" so path.join works on Windows (e.g. "/uploads/uuid.jpg" → "uploads/uuid.jpg")
         const inputPath = inputUrls[0]
-          ? join(process.cwd(), inputUrls[0])
+          ? join(process.cwd(), inputUrls[0].replace(/^\/+/, ''))
           : null
 
         let inputBuffer: Buffer | null = null
