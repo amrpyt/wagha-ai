@@ -301,7 +301,22 @@ function NewProjectPageInner() {
 
             {/* COMPLETE: BeforeAfterSlider + optional prompt/reference strip */}
             {canvasState === 'complete' && activeVersion && (
-              <div className="h-full flex flex-col">
+              <div className="h-full flex flex-col relative">
+                {/* Download button — top right of canvas */}
+                <div className="absolute top-3 left-3 z-10">
+                  <a
+                    href={activeVersion.renderUrl}
+                    download={`${projectId || 'render'}-render.jpg`}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-white/90 text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer text-sm shadow-sm"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    تحميل JPG
+                  </a>
+                </div>
                 <div className="flex-1">
                   <BeforeAfterSlider
                     before={activeVersion.inputUrl}
