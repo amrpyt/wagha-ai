@@ -59,6 +59,7 @@ export async function uploadAndGenerate(
       project_number: projectNumber,
       status: 'processing',
       created_by: user.id,
+      input_urls: [inputPath],
     })
     .select('id')
     .single()
