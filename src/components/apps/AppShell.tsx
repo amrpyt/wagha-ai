@@ -1,5 +1,3 @@
-'use client'
-
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { TopBar } from '@/components/dashboard/TopBar'
 import { createClient } from '@/lib/supabase/server'
@@ -9,7 +7,6 @@ interface AppShellProps {
   children: React.ReactNode
 }
 
-// Fetch firm data server-side, pass to client shell
 export async function AppShell({ children }: AppShellProps) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -22,9 +19,9 @@ export async function AppShell({ children }: AppShellProps) {
     .from('firm_members')
     .select('firm_id, role, firms(name, brand_color)')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: { firm_id: string; role: string; firms: { name?: string; brand_color?: string } | null } | null }
 
-  const firm = firmMember?.firms
+  const firm = firmMember?.firms as { name?: string; brand_color?: string } | undefined
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">

@@ -32,3 +32,6 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 python-gemini/
 *.png
+.gstack/
+
+.vercel

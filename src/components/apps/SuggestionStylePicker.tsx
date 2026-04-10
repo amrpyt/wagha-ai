@@ -1,6 +1,6 @@
 'use client'
 
-interface StyleOption {
+export interface StyleOption {
   id: string
   label: string
   description: string

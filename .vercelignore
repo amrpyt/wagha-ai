@@ -1,0 +1,23 @@
+# Build artifacts
+.next/
+node_modules/
+dist/
+build/
+
+# Development files
+.env
+.env.*
+!.env.example
+*.log
+coverage/
+.cache/
+tmp/
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db

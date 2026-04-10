@@ -276,7 +276,7 @@ export const MODIFIER_LABELS: Record<string, string> = {
   // Color palette values
   warm: 'دافئ',
   cool: 'بارد',
-  neutral: 'محايد',
+  colorPalette_neutral: 'محايد',
   bold: 'جريء',
   // Lighting mood values
   natural: 'طبيعي',
