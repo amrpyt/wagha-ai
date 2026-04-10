@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 import { getTeamMembers, getInvitations } from '@/lib/actions/settings'
 import { TeamInviteForm } from '@/components/settings/TeamInviteForm'
 import { TeamMemberList } from '@/components/settings/TeamMemberList'
+import type { Database } from '@/types/database.types'
+
+type FirmMemberRow = Database['public']['Tables']['firm_members']['Row']
 
 export default async function TeamSettingsPage() {
   const supabase = await createClient()
@@ -16,7 +19,7 @@ export default async function TeamSettingsPage() {
     .from('firm_members')
     .select('role')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMemberRow | null }
 
   if (!firmMember || firmMember.role !== 'admin') {
     redirect('/settings')

@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { createPaymobOrder as createPaymobOrderClient, verifyPaymobWebhook } from '@/lib/paymob/client'
-import type { Subscription } from '@/types/database.types'
+import type { Subscription, FirmMember, Firm } from '@/types/database.types'
 import { PLANS } from '@/lib/billing-plans'
 
 // ================================================
@@ -19,7 +19,7 @@ export async function getSubscription(): Promise<Subscription | null> {
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMember | null }
 
   if (!firmMember) return null
 
@@ -27,7 +27,7 @@ export async function getSubscription(): Promise<Subscription | null> {
     .from('subscriptions')
     .select('*')
     .eq('firm_id', firmMember.firm_id)
-    .single()
+    .single() as { data: Subscription | null }
 
   return subscription
 }
@@ -48,7 +48,7 @@ export async function checkRenderAccess(): Promise<{
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMember | null }
 
   if (!firmMember) {
     return { allowed: false, reason: 'ليست عضو في شركة' }
@@ -59,12 +59,11 @@ export async function checkRenderAccess(): Promise<{
     .from('firms')
     .select('free_render_used')
     .eq('id', firmMember.firm_id)
-    .single()
+    .single() as { data: { free_render_used: boolean } | null }
 
   if (!firm?.free_render_used) {
     // First render is free - mark it as used
-    await supabase
-      .from('firms')
+    await (supabase.from('firms') as any)
       .update({ free_render_used: true })
       .eq('id', firmMember.firm_id)
 
@@ -103,7 +102,7 @@ export async function deductCredit(): Promise<{ success: boolean; error?: string
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMember | null }
 
   if (!firmMember) return { success: false, error: 'ليست عضو في شركة' }
 
@@ -113,17 +112,16 @@ export async function deductCredit(): Promise<{ success: boolean; error?: string
     .select('credits_remaining')
     .eq('firm_id', firmMember.firm_id)
     .eq('status', 'active')
-    .single()
+    .single() as { data: { credits_remaining: number } | null }
 
   if (!sub || sub.credits_remaining <= 0) {
     return { success: false, error: 'لا يوجد رصيد متبقي' }
   }
 
-  const { error } = await supabase
-    .from('subscriptions')
+  const { error } = await (supabase.from('subscriptions') as any)
     .update({ credits_remaining: sub.credits_remaining - 1 })
     .eq('firm_id', firmMember.firm_id)
-    .eq('credits_remaining', sub.credits_remaining) // Atomic check
+    .eq('credits_remaining', sub.credits_remaining)
 
   if (error) {
     return { success: false, error: 'خطأ في تحديث الرصيد' }
@@ -155,7 +153,7 @@ export async function createPaymobOrder(plan: string): Promise<{
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMember | null }
 
   if (!firmMember) {
     return { success: false, error: 'ليست عضو في شركة' }
@@ -179,8 +177,7 @@ export async function createPaymobOrder(plan: string): Promise<{
     })
 
     // Store order info for webhook verification
-    await supabase
-      .from('pending_orders')
+    await (supabase.from('pending_orders') as any)
       .insert({
         firm_id: firmMember.firm_id,
         plan,
@@ -213,12 +210,11 @@ export async function cancelSubscription(): Promise<{ success: boolean; error?: 
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMember | null }
 
   if (!firmMember) return { success: false, error: 'ليست عضو في شركة' }
 
-  const { error } = await supabase
-    .from('subscriptions')
+  const { error } = await (supabase.from('subscriptions') as any)
     .update({ status: 'cancelled' })
     .eq('firm_id', firmMember.firm_id)
     .eq('status', 'active')

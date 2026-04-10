@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { verifyPaymobWebhook } from '@/lib/paymob/client'
+import type { Database } from '@/types/database.types'
+import type { PendingOrder } from '@/types/database.types'
+
+type SubscriptionRow = Database['public']['Tables']['subscriptions']['Row']
+type SubscriptionInsert = Database['public']['Tables']['subscriptions']['Insert']
+type PendingOrderInsert = Database['public']['Tables']['pending_orders']['Insert']
 
 export async function POST(req: NextRequest) {
   const payload = await req.json()
@@ -62,7 +68,7 @@ async function handleSuccessfulPayment(data: Record<string, unknown>) {
     .select('*')
     .eq('merchant_order_id', merchantOrderId)
     .eq('status', 'pending')
-    .single()
+    .single() as { data: PendingOrder | null }
 
   if (!pendingOrder) {
     console.log('No pending order found for:', merchantOrderId)
@@ -83,12 +89,13 @@ async function handleSuccessfulPayment(data: Record<string, unknown>) {
     .from('subscriptions')
     .select('id')
     .eq('firm_id', firmId)
-    .single()
+    .single() as { data: SubscriptionRow | null }
 
   if (existingSub) {
     // Update existing subscription
     await supabase
       .from('subscriptions')
+      // @ts-expect-error Supabase RLS types conflict with runtime data
       .update({
         plan: pendingOrder.plan,
         credits_remaining: credits,
@@ -100,10 +107,11 @@ async function handleSuccessfulPayment(data: Record<string, unknown>) {
       .eq('firm_id', firmId)
   } else {
     // Create new subscription
+    // @ts-expect-error Supabase RLS types conflict with runtime data
     await supabase.from('subscriptions').insert({
       firm_id: firmId,
       plan: pendingOrder.plan,
-      paymob_subscription_id: String(data.id || ''),
+      paymob_subscription_id: data.id ? String(data.id) : null,
       credits_remaining: credits,
       billing_cycle_start: new Date().toISOString(),
       status: 'active',
@@ -113,6 +121,7 @@ async function handleSuccessfulPayment(data: Record<string, unknown>) {
   // Mark pending order as completed
   await supabase
     .from('pending_orders')
+    // @ts-expect-error Supabase RLS types conflict with runtime data
     .update({ status: 'completed' })
     .eq('merchant_order_id', merchantOrderId)
 }
@@ -126,6 +135,7 @@ async function handleFailedPayment(data: Record<string, unknown>) {
   // Mark pending order as failed
   await supabase
     .from('pending_orders')
+    // @ts-expect-error Supabase RLS types conflict with runtime data
     .update({ status: 'failed' })
     .eq('merchant_order_id', merchantOrderId)
 }

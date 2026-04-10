@@ -15,7 +15,7 @@ export async function getProjects(): Promise<Project[]> {
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: { firm_id: string } | null }
 
   if (!firmMember) return []
 
@@ -44,7 +44,7 @@ export async function getProject(id: string): Promise<Project | null> {
     .from('projects')
     .select('*, folders(name)')
     .eq('id', id)
-    .single()
+    .single() as { data: (Project & { folders: { name: string } }) | null; error: null }
 
   if (error) {
     console.error('Error fetching project:', error)
@@ -60,7 +60,7 @@ export async function deleteProject(id: string): Promise<{ success: boolean; err
   const { error } = await supabase
     .from('projects')
     .delete()
-    .eq('id', id)
+    .eq('id', id) as unknown as { error: { message: string } | null }
 
   if (error) {
     return { success: false, error: 'فشل حذف المشروع' }
@@ -92,14 +92,13 @@ export async function createProject(
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: { firm_id: string } | null }
 
   if (!firmMember) {
     return { success: false, error: 'ليست عضو في شركة' }
   }
 
-  const { data: project, error } = await supabase
-    .from('projects')
+  const { data: project, error } = await (supabase.from('projects') as any)
     .insert({
       firm_id: firmMember.firm_id,
       name: data.name,
@@ -117,5 +116,5 @@ export async function createProject(
 
   revalidatePath('/dashboard')
   revalidatePath('/projects')
-  return { success: true, project }
+  return { success: true, project: project ?? undefined }
 }

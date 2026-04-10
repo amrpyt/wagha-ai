@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { FirmSettingsForm } from '@/components/settings/FirmSettingsForm'
+import type { Database } from '@/types/database.types'
+
+type FirmMemberRow = Database['public']['Tables']['firm_members']['Row']
 
 export default async function FirmSettingsPage() {
   const supabase = await createClient()
@@ -14,7 +17,7 @@ export default async function FirmSettingsPage() {
     .from('firm_members')
     .select('firm_id, role')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMemberRow | null }
 
   if (!firmMember || firmMember.role !== 'admin') {
     redirect('/settings')
@@ -24,7 +27,7 @@ export default async function FirmSettingsPage() {
     .from('firms')
     .select('name, logo_url, brand_color')
     .eq('id', firmMember.firm_id)
-    .single()
+    .single() as { data: Database['public']['Tables']['firms']['Row'] | null }
 
   return (
     <div className="max-w-2xl">

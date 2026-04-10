@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { TopBar } from '@/components/dashboard/TopBar'
+import type { Database } from '@/types/database.types'
 
 export default async function DashboardLayout({
   children,
@@ -20,7 +21,7 @@ export default async function DashboardLayout({
     .from('firm_members')
     .select('firm_id, role, firms(name, brand_color)')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: { firm_id: string; role: string; firms: { name?: string; brand_color?: string } | null } | null }
 
   const firm = firmMember?.firms as { name?: string; brand_color?: string } | undefined
 

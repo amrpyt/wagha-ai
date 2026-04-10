@@ -6,7 +6,10 @@ import { revalidatePath } from 'next/cache'
 import { validateMagicBytes, validateFile, MAX_SIZE_BYTES } from '@/lib/upload/validation'
 import { processUploadedFile } from '@/lib/upload/processing'
 import { saveUploadedFile } from '@/lib/upload/storage'
+import type { Database } from '@/types/database.types'
 import type { UploadState } from '@/types/upload'
+
+type FirmMemberRow = Database['public']['Tables']['firm_members']['Row']
 
 export async function uploadAndGenerate(
   prevState: UploadState,
@@ -21,7 +24,7 @@ export async function uploadAndGenerate(
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMemberRow | null }
   if (!firmMember) return { error: 'ليست عضو في شركة' }
 
   // Extract form fields

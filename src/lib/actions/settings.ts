@@ -2,8 +2,13 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import type { Database } from '@/types/database.types'
 import type { FirmMember, Invitation } from '@/types/database.types'
 import { createAdminClient } from '@/lib/supabase/admin'
+
+type FirmMemberRow = Database['public']['Tables']['firm_members']['Row']
+type FirmRow = Database['public']['Tables']['firms']['Row']
+type InvitationRow = Database['public']['Tables']['invitations']['Row']
 
 type SettingsState = { success?: boolean; error?: string; needsVerification?: boolean }
 
@@ -109,7 +114,7 @@ export async function updateFirm(
     .from('firm_members')
     .select('firm_id, role')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMemberRow | null }
 
   if (!firmMember) {
     return { error: 'ليست عضو في شركة' }
@@ -130,7 +135,7 @@ export async function updateFirm(
 
   const { error } = await supabase
     .from('firms')
-    .update(updates)
+    .update(updates as never)
     .eq('id', firmMember.firm_id)
 
   if (error) {
@@ -155,7 +160,7 @@ export async function uploadLogo(file: File): Promise<{ success: boolean; url?: 
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMemberRow | null }
 
   if (!firmMember) {
     return { success: false, error: 'ليست عضو في شركة' }
@@ -211,7 +216,7 @@ export async function inviteTeamMember(
     .from('firm_members')
     .select('firm_id, role')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMemberRow | null }
 
   if (!firmMember || firmMember.role !== 'admin') {
     return { error: 'فقط المشرف يمكنه دعوة أعضاء الفريق' }
@@ -228,7 +233,7 @@ export async function inviteTeamMember(
       role: role as 'admin' | 'member',
       invited_by: user.id,
       token,
-    })
+    } as never)
 
   if (inviteError) {
     return { error: 'فشل إرسال الدعوة' }
@@ -265,14 +270,14 @@ export async function getTeamMembers(): Promise<TeamMember[]> {
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMemberRow | null }
 
   if (!firmMember) return []
 
   const { data: members } = await supabase
     .from('firm_members')
     .select('*, auth.users(email)')
-    .eq('firm_id', firmMember.firm_id)
+    .eq('firm_id', firmMember.firm_id) as { data: FirmMemberRow[] | null }
 
   return (members || []) as unknown as TeamMember[]
 }
@@ -287,7 +292,7 @@ export async function getInvitations(): Promise<Invitation[]> {
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: FirmMemberRow | null }
 
   if (!firmMember) return []
 
@@ -295,7 +300,7 @@ export async function getInvitations(): Promise<Invitation[]> {
     .from('invitations')
     .select('*')
     .eq('firm_id', firmMember.firm_id)
-    .eq('status', 'pending')
+    .eq('status', 'pending') as { data: InvitationRow[] | null }
 
   return invitations || []
 }

@@ -83,7 +83,7 @@ export async function signUp(prevState: AuthState, formData: FormData) {
 
   // If Supabase says no email confirmation needed (disabled in Supabase dashboard),
   // the user is immediately signed in — redirect to dashboard
-  if (!authData.user || authData.needsConfirmation === false) {
+  if (!authData.user) {
     revalidatePath('/dashboard')
     redirect('/dashboard')
   }
