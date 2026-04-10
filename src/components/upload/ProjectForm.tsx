@@ -61,7 +61,7 @@ export function ProjectForm({ file, uploadAction, onUploadStart, onError }: Proj
           value={projectName}
           onChange={(e) => setProjectName(e.target.value)}
           placeholder="مشروع Villa 2024"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A5F] focus:border-transparent text-right"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A5F] focus:border-transparent text-right text-gray-900"
           dir="rtl"
           required
         />
@@ -78,7 +78,7 @@ export function ProjectForm({ file, uploadAction, onUploadStart, onError }: Proj
           value={projectNumber}
           onChange={(e) => setProjectNumber(e.target.value)}
           placeholder="2024-001"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A5F] focus:border-transparent text-right"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1E3A5F] focus:border-transparent text-right text-gray-900"
           dir="rtl"
         />
       </div>

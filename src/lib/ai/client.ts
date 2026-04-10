@@ -1,13 +1,10 @@
-import { EXTERIOR_RENDER_PROMPT } from './prompts'
+import { GoogleGenerativeAI } from '@google/generative-ai'
+import {
+  RenderOptions,
+  buildPrompt,
+} from './prompts'
 
-const PYTHON_GEMINI_URL = process.env.PYTHON_GEMINI_URL || 'http://localhost:8000'
 const TIMEOUT_MS = 120_000
-
-interface GenerationOptions {
-  imageBuffer: Buffer
-  signal?: AbortSignal
-  onProgress?: (progress: number, status: string) => void
-}
 
 async function fetchWithRetry<T>(
   fn: () => Promise<T>,
@@ -29,22 +26,44 @@ async function fetchWithRetry<T>(
   throw new Error('unreachable')
 }
 
-export async function generateExteriorRender(
-  options: GenerationOptions
+export async function generateRender(
+  options: RenderOptions
 ): Promise<Buffer> {
-  const { imageBuffer, signal, onProgress } = options
+  const { imageBuffers, referenceBuffers, signal, onProgress } = options
 
-  if (!PYTHON_GEMINI_URL) {
-    throw new Error('PYTHON_GEMINI_URL environment variable is not set')
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  if (!apiKey) {
+    throw new Error('GOOGLE_GENERATIVE_AI_API_KEY environment variable is not set')
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey)
+  const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-image-preview' })
+
+  // Build the text prompt from options
+  const textPrompt = buildPrompt(options)
+
+  // Assemble all image parts — first image is the main input, rest are references
+  const imageParts = imageBuffers.map((buf, i) => ({
+    inlineData: {
+      data: buf.toString('base64'),
+      mimeType: 'image/jpeg',
+    },
+  }))
+
+  // Reference images come after the main image
+  if (referenceBuffers && referenceBuffers.length > 0) {
+    const refParts = referenceBuffers.map((buf) => ({
+      inlineData: {
+        data: buf.toString('base64'),
+        mimeType: 'image/jpeg',
+      },
+    }))
+    imageParts.push(...refParts)
   }
 
   onProgress?.(10, 'uploading')
 
-  const base64Image = imageBuffer.toString('base64')
-
-  onProgress?.(25, 'generating')
-
-  const response = await fetchWithRetry(
+  const result = await fetchWithRetry(
     async () => {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS)
@@ -54,23 +73,19 @@ export async function generateExteriorRender(
       }
 
       try {
-        const res = await fetch(`${PYTHON_GEMINI_URL}/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: EXTERIOR_RENDER_PROMPT,
-            image_base64: base64Image,
-          }),
-          signal: controller.signal,
+        const response = await model.generateContent({
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                ...imageParts,
+                { text: textPrompt },
+              ],
+            },
+          ],
         })
         clearTimeout(timeoutId)
-
-        if (!res.ok) {
-          if (res.status === 429) throw new Error('429: Rate limit exceeded')
-          const text = await res.text()
-          throw new Error(`API error ${res.status} ${res.statusText}: ${text}`)
-        }
-        return res
+        return response
       } catch (e) {
         clearTimeout(timeoutId)
         throw e
@@ -81,8 +96,20 @@ export async function generateExteriorRender(
 
   onProgress?.(75, 'processing')
 
-  const json = await response.json()
-  const resultBuffer = Buffer.from(json.image_base64, 'base64')
+  const response = result.response
+  const imageResultParts = response.candidates
+    ?.flatMap((c) => c.content.parts)
+    ?.filter((p) => p.inlineData?.data)
+
+  if (!imageResultParts || imageResultParts.length === 0) {
+    const text = response.text()
+    throw new Error(`No image generated. Model response: ${text}`)
+  }
+
+  const resultBuffer = Buffer.from(
+    imageResultParts[0].inlineData!.data,
+    'base64'
+  )
 
   onProgress?.(100, 'complete')
   return resultBuffer

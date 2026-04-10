@@ -138,6 +138,14 @@ create table projects (
   project_number text,
   status text not null default 'pending'
     check (status in ('pending', 'processing', 'complete', 'failed')),
+  render_type text default 'exterior'
+    check (render_type in ('exterior', 'interior')),
+  template text default 'modern'
+    check (template in ('modern', 'classic', 'minimal', 'villa', 'commercial', 'landscape', 'residential', 'commercial', 'office', 'retail')),
+  modifiers jsonb default '{}',
+  custom_prompt text,
+  input_urls text[],
+  reference_urls text[],
   render_url text,
   pdf_url text,
   error_message text,

@@ -31,10 +31,11 @@ export default async function DashboardPage() {
         <p className="text-gray-500 mb-6 max-w-md">
           ارفع أول تصميم للحصول على صورة معمارية ثلاثية الأبعاد احترافية
         </p>
-        <Link href="/projects/new">
-          <button className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-colors cursor-pointer" style={{ backgroundColor: '#1E3A5F' }}>
-            ابدأ بـ رفع تصميمك مجاناً
-          </button>
+        <Link
+          href="/dashboard/projects/new"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-medium hover:opacity-90 transition-colors cursor-pointer" style={{ backgroundColor: '#1E3A5F' }}
+        >
+          ابدأ بـ رفع تصميمك مجاناً
         </Link>
       </div>
     )
@@ -46,10 +47,11 @@ export default async function DashboardPage() {
         <h2 className="text-xl font-semibold text-gray-900">
           المشاريع الأخيرة
         </h2>
-        <Link href="/projects/new">
-          <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer border" style={{ borderColor: '#1E3A5F', color: '#1E3A5F' }}>
-            مشروع جديد
-          </button>
+        <Link
+          href="/dashboard/projects/new"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer border" style={{ borderColor: '#1E3A5F', color: '#1E3A5F' }}
+        >
+          مشروع جديد
         </Link>
       </div>
       <ProjectGrid projects={projects} />

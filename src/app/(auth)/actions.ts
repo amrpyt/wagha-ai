@@ -81,6 +81,13 @@ export async function signUp(prevState: AuthState, formData: FormData) {
     return { error: 'فشل إنشاء الشركة' }
   }
 
+  // If Supabase says no email confirmation needed (disabled in Supabase dashboard),
+  // the user is immediately signed in — redirect to dashboard
+  if (!authData.user || authData.needsConfirmation === false) {
+    revalidatePath('/dashboard')
+    redirect('/dashboard')
+  }
+
   // Supabase sends verification email automatically
   return { success: true, needsVerification: true }
 }

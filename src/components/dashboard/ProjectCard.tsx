@@ -25,7 +25,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   }).format(new Date(project.created_at))
 
   return (
-    <Link href={`/projects/${project.id}`} className="block">
+    <Link href={`/dashboard/projects/${project.id}`} className="block">
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
         {/* Thumbnail area */}
         <div className="aspect-video bg-gray-100 flex items-center justify-center relative">
