@@ -205,6 +205,7 @@ export type Database = {
           reference_urls: string[] | null
           render_type: string | null
           render_url: string | null
+          selective_edit: boolean | null
           status: string
           template: string | null
           updated_at: string | null
@@ -225,6 +226,7 @@ export type Database = {
           reference_urls?: string[] | null
           render_type?: string | null
           render_url?: string | null
+          selective_edit?: boolean | null
           status?: string
           template?: string | null
           updated_at?: string | null
@@ -245,6 +247,7 @@ export type Database = {
           reference_urls?: string[] | null
           render_type?: string | null
           render_url?: string | null
+          selective_edit?: boolean | null
           status?: string
           template?: string | null
           updated_at?: string | null

@@ -33,6 +33,8 @@ export async function POST(request: NextRequest) {
     const template = (formData.get('template') as string || 'modern')
     const modifiersRaw = formData.get('modifiers') as string | null
     const customPrompt = (formData.get('customPrompt') as string | null)?.trim() || null
+    const selectiveEditStr = formData.get('selectiveEdit') as string | null
+    const selectiveEdit = selectiveEditStr === 'true'
 
     let modifiers: Record<string, unknown> = {}
     if (modifiersRaw) {
@@ -72,6 +74,7 @@ export async function POST(request: NextRequest) {
         template,
         modifiers,
         custom_prompt: customPrompt,
+        selective_edit: selectiveEdit,
         input_urls: [inputPath],
       } as ProjectsInsert)
       .select('id')
@@ -81,7 +84,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'فشل إنشاء المشروع' }, { status: 500 })
     }
 
-    return NextResponse.json({ projectId: project.id })
+    return NextResponse.json({ projectId: project.id, selectiveEdit })
   } catch (error) {
     console.error('Project create error:', error)
     return NextResponse.json(
