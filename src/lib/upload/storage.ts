@@ -1,7 +1,8 @@
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 
-const UPLOAD_DIR = join(process.cwd(), 'uploads')
+// Save to public/uploads so Next.js serves them as static files
+const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads')
 
 export async function saveUploadedFile(
   buffer: Buffer,
