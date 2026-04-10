@@ -10,6 +10,45 @@ interface SidebarProps {
   userName: string
 }
 
+// Fast design shortcuts — link to new project page with pre-filled options
+const FAST_DESIGNS = [
+  {
+    label: 'خارجي - حديث',
+    href: '/dashboard/projects/new?type=exterior&template=modern',
+    icon: '🏠',
+  },
+  {
+    label: 'خارجي - كلاسيكي',
+    href: '/dashboard/projects/new?type=exterior&template=classic',
+    icon: '🏛️',
+  },
+  {
+    label: 'خارجي - مينيمال',
+    href: '/dashboard/projects/new?type=exterior&template=minimal',
+    icon: '⬜',
+  },
+  {
+    label: 'خارجي - فيلا',
+    href: '/dashboard/projects/new?type=exterior&template=villa',
+    icon: '🏡',
+  },
+  {
+    label: 'خارجي - تجاري',
+    href: '/dashboard/projects/new?type=exterior&template=commercial',
+    icon: '🏢',
+  },
+  {
+    label: 'داخلي - سكني',
+    href: '/dashboard/projects/new?type=interior&template=residential',
+    icon: '🏠',
+  },
+  {
+    label: 'داخلي - مكتبي',
+    href: '/dashboard/projects/new?type=interior&template=office',
+    icon: '💼',
+  },
+]
+
 export function Sidebar({ firmName, brandColor, userName }: SidebarProps) {
   const pathname = usePathname()
 
@@ -73,7 +112,8 @@ export function Sidebar({ firmName, brandColor, userName }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        {/* Main nav */}
         <div className="space-y-1">
           {navItems.map((item) => (
             <Link
@@ -92,6 +132,28 @@ export function Sidebar({ firmName, brandColor, userName }: SidebarProps) {
           ))}
         </div>
 
+        {/* Fast Designs shortcut */}
+        <div className="pt-4 mt-4 border-t border-gray-200 space-y-1">
+          <p className="text-xs text-gray-400 px-3 pb-2 text-right">
+            التصاميم السريعة
+          </p>
+          {FAST_DESIGNS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors w-full ${
+                pathname === item.href
+                  ? ''
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <span className="text-base">{item.icon}</span>
+              <span className="text-sm text-right">{item.label}</span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Settings */}
         <div className="pt-4 mt-4 border-t border-gray-200 space-y-1">
           <p className="text-xs text-gray-400 px-3 pb-2 text-right">
             الإعدادات

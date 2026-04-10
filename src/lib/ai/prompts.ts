@@ -37,6 +37,8 @@ export interface RenderOptions {
   template: ExteriorTemplate | InteriorTemplate
   modifiers: RenderModifiers
   customPrompt?: string
+  signal?: AbortSignal
+  onProgress?: (progress: number, status: string) => void
 }
 
 // ============================================================
@@ -187,47 +189,47 @@ export function buildPrompt(options: RenderOptions): string {
   const parts: string[] = [base]
 
   if (modifiers.cameraAngle) {
-    const val = MODIFIERS.cameraAngle[modifier.cameraAngle]
+    const val = MODIFIERS.cameraAngle[modifiers.cameraAngle]
     if (val) parts.push(val)
   }
 
   if (modifiers.greenery) {
-    const val = MODIFIERS.greenery[modifier.greenery]
+    const val = MODIFIERS.greenery[modifiers.greenery]
     if (val) parts.push(val)
   }
 
   if (modifiers.vehicles) {
-    const val = MODIFIERS.vehicles[modifier.vehicles]
+    const val = MODIFIERS.vehicles[modifiers.vehicles]
     if (val) parts.push(val)
   }
 
   if (modifiers.people) {
-    const val = MODIFIERS.people[modifier.people]
+    const val = MODIFIERS.people[modifiers.people]
     if (val) parts.push(val)
   }
 
   if (modifiers.streetProps) {
-    const val = MODIFIERS.streetProps[modifier.streetProps]
+    const val = MODIFIERS.streetProps[modifiers.streetProps]
     if (val) parts.push(val)
   }
 
   if (modifiers.timeOfDay) {
-    const val = MODIFIERS.timeOfDay[modifier.timeOfDay]
+    const val = MODIFIERS.timeOfDay[modifiers.timeOfDay]
     if (val) parts.push(val)
   }
 
   if (modifiers.weather) {
-    const val = MODIFIERS.weather[modifier.weather]
+    const val = MODIFIERS.weather[modifiers.weather]
     if (val) parts.push(val)
   }
 
   if (modifiers.mood) {
-    const val = MODIFIERS.mood[modifier.mood]
+    const val = MODIFIERS.mood[modifiers.mood]
     if (val) parts.push(val)
   }
 
   if (modifiers.ground) {
-    const val = MODIFIERS.ground[modifier.ground]
+    const val = MODIFIERS.ground[modifiers.ground]
     if (val) parts.push(val)
   }
 
