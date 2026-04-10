@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         template,
         modifiers,
         custom_prompt: customPrompt,
-        input_url: inputPath,
+        input_urls: [inputPath],
       })
       .select('id')
       .single()

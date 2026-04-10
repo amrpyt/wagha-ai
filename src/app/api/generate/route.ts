@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
         const admin = createAdminClient()
         const { data: project, error: projectError } = await admin
           .from('projects')
-          .select('id, status, firm_id, render_type, template, modifiers, custom_prompt, input_url')
+          .select('id, status, firm_id, render_type, template, modifiers, custom_prompt, input_urls')
           .eq('id', projectId)
           .single()
 
@@ -62,9 +62,10 @@ export async function GET(request: NextRequest) {
 
         send({ progress: 10, status: 'جاري قراءة الملف...' })
 
-        // Read input image from project record's input_url
-        const inputPath = project.input_url
-          ? join(process.cwd(), project.input_url)
+        // Read input image from project record's input_urls (first entry)
+        const inputUrls = (project.input_urls || []) as string[]
+        const inputPath = inputUrls[0]
+          ? join(process.cwd(), inputUrls[0])
           : null
 
         let inputBuffer: Buffer | null = null
