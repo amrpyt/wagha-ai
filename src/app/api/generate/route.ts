@@ -103,8 +103,8 @@ export async function GET(request: NextRequest) {
         // Build render options from project record
         const renderOptions: RenderOptions = {
           imageBuffers: [inputBuffer],
-          renderType: project.render_type || 'exterior',
-          template: project.template || 'modern',
+          renderType: (project.render_type as RenderOptions['renderType']) || 'exterior',
+          template: (project.template as RenderOptions['template']) || 'modern',
           modifiers: (project.modifiers as RenderOptions['modifiers']) || {},
           customPrompt: project.custom_prompt || undefined,
         }

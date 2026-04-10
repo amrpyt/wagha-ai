@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { processUploadedFile } from '@/lib/upload/processing'
 import { validateFile } from '@/lib/upload/validation'
+import type { Database } from '@/lib/supabase/database.types'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,11 +14,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Get firm membership
+    type FirmMemberRow = Database['public']['Tables']['firm_members']['Row']
     const { data: firmMember } = await supabase
       .from('firm_members')
       .select('firm_id')
       .eq('user_id', user.id)
-      .single()
+      .single() as { data: FirmMemberRow | null }
     if (!firmMember) {
       return NextResponse.json({ error: 'ليست عضو في شركة' }, { status: 403 })
     }
