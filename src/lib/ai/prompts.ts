@@ -59,6 +59,7 @@ export interface RenderOptions {
   template: ExteriorTemplate | InteriorTemplate
   modifiers: RenderModifiers
   customPrompt?: string
+  selectiveEdit?: boolean  // D-12/D-13/D-14: selective editing mode
   signal?: AbortSignal
   onProgress?: (progress: number, status: string) => void
 }
@@ -484,6 +485,15 @@ export function buildPrompt(options: RenderOptions): string {
   // User's custom prompt
   if (customPrompt?.trim()) {
     parts.push(customPrompt.trim())
+  }
+
+  // Selective editing mode — preserve original, only change specified element (D-12/D-13/D-14)
+  if (options.selectiveEdit && customPrompt?.trim()) {
+    parts.push(
+      'Keep the original image exactly as-is. Only change the following element as specified. Do not alter anything else: ' +
+      customPrompt.trim() +
+      '. Preserve all other architectural elements, materials, colors, and composition unchanged.'
+    )
   }
 
   return parts.join(' ') + '. ' + CLOSING

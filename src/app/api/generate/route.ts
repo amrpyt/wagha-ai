@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
         const admin = createAdminClient()
         const { data: project, error: projectError } = await admin
           .from('projects')
-          .select('id, status, firm_id, render_type, template, modifiers, custom_prompt, input_urls')
+          .select('id, status, firm_id, render_type, template, modifiers, custom_prompt, input_urls, selective_edit')
           .eq('id', projectId)
           .single()
 
@@ -109,6 +109,7 @@ export async function GET(request: NextRequest) {
           template: (project.template as RenderOptions['template']) || 'modern',
           modifiers: (project.modifiers as RenderOptions['modifiers']) || {},
           customPrompt: project.custom_prompt || undefined,
+          selectiveEdit: (project as { selective_edit?: boolean }).selective_edit ?? false,
         }
 
         // Create AbortController for cancel + timeout
