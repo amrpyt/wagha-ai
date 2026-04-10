@@ -324,7 +324,7 @@ const CLOSING = 'High quality photorealistic render suitable for professional ar
 export function buildPrompt(options: RenderOptions): string {
   const { renderType, template, modifiers, referenceBuffers, customPrompt } = options
 
-  const key = `${renderType}_${template}`
+  const key = `${renderType}-${template}`
   const base = BASE_PROMPTS[key] ?? BASE_PROMPTS[`${renderType}_modern`]
 
   const parts: string[] = [base]

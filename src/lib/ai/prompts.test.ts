@@ -134,12 +134,12 @@ describe('buildPrompt', () => {
   })
 
   it('returns prompt with closing for interior template', () => {
-    // NOTE: interior templates use hyphen in BASE_PROMPTS (interior-residential)
-    // but buildPrompt uses underscore in key construction, so base falls through
-    // Only closing text appears in the result
     const result = buildPrompt(makeOptions({ renderType: 'interior', template: 'residential' }))
     expect(result).toContain('High quality photorealistic render')
     expect(result).toContain('No text, no watermarks')
+    // base prompt should now be included (hyphen key fixed)
+    expect(result).toContain('residential')
+    expect(result).toContain('open-plan')
   })
 
   it('trims custom prompt whitespace', () => {
