@@ -70,8 +70,9 @@ export async function updateSession(request: NextRequest) {
   const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
   const isSettings = request.nextUrl.pathname.startsWith('/settings')
   const isProjects = request.nextUrl.pathname.startsWith('/projects')
+  const isApps = request.nextUrl.pathname.startsWith('/apps')
 
-  if (!user && (isDashboard || isSettings || isProjects)) {
+  if (!user && (isDashboard || isSettings || isProjects || isApps)) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
