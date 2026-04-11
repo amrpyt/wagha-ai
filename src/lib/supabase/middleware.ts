@@ -1,30 +1,10 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from './database.types'
+import { decodeJWT, isTokenExpired } from '@/lib/auth/jwt'
 
-// Decode JWT directly to get user ID without calling auth API (bypasses Bearer null issue)
-function decodeJWT(token: string): { sub: string; email?: string; aud: string; exp?: number } | null {
-  try {
-    const parts = token.split('.')
-    if (parts.length !== 3) return null
-    // Handle base64url encoding (ES256 JWTs use this)
-    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
-    // Add padding if needed
-    const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
-    const payload = JSON.parse(Buffer.from(padded, 'base64').toString('utf-8'))
-    return payload
-  } catch {
-    return null
-  }
-}
-
-// Check if session token is expired
-function isTokenExpired(accessToken: string): boolean {
-  const payload = decodeJWT(accessToken)
-  if (!payload?.exp) return true // treat missing exp as expired
-  const now = Math.floor(Date.now() / 1000)
-  return payload.exp < now
-}
+// Re-export for other consumers
+export { decodeJWT, isTokenExpired } from '@/lib/auth/jwt'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })

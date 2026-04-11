@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getUserFromCookie } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { validateMagicBytes, validateFile, MAX_SIZE_BYTES } from '@/lib/upload/validation'
@@ -9,22 +9,21 @@ import { saveUploadedFile } from '@/lib/upload/storage'
 import type { Database } from '@/types/database.types'
 import type { UploadState } from '@/types/upload'
 
-type FirmMemberRow = Database['public']['Tables']['firm_members']['Row']
-
 export async function uploadAndGenerate(
   prevState: UploadState,
   formData: FormData
 ): Promise<UploadState> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // Decode JWT from cookie directly — bypasses auth-js getUser() which has Bearer null bug
+  const user = await getUserFromCookie()
   if (!user) return { error: 'غير مصرح' }
 
   // Get firm membership
+  const supabase = await createClient()
   const { data: firmMember } = await supabase
     .from('firm_members')
     .select('firm_id')
     .eq('user_id', user.id)
-    .single() as { data: FirmMemberRow | null }
+    .single() as { data: { firm_id: string } | null }
   if (!firmMember) return { error: 'ليست عضو في شركة' }
 
   // Extract form fields

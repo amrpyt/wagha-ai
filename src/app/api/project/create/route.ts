@@ -1,25 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient, getUserFromCookie } from '@/lib/supabase/server'
 import { processUploadedFile } from '@/lib/upload/processing'
 import { validateFile } from '@/lib/upload/validation'
 import type { Database } from '@/lib/supabase/database.types'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    // Decode JWT from cookie directly — bypasses auth-js getUser() which has Bearer null bug
+    const user = await getUserFromCookie()
     if (!user) {
       return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
     }
 
     // Get firm membership
-    type FirmMemberRow = Database['public']['Tables']['firm_members']['Row']
+    const supabase = await createClient()
     const { data: firmMember } = await supabase
       .from('firm_members')
       .select('firm_id')
       .eq('user_id', user.id)
-      .single() as { data: FirmMemberRow | null }
+      .single()
     if (!firmMember) {
       return NextResponse.json({ error: 'ليست عضو في شركة' }, { status: 403 })
     }

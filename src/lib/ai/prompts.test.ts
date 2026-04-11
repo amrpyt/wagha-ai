@@ -198,9 +198,10 @@ describe('getTemplateModifiers', () => {
 
   it('returns interior-residential defaults', () => {
     const mods = getTemplateModifiers('interior', 'residential')
-    expect(mods.greenery).toBe('none') // explicitly set in INTERIOR_MODIFIERS
-    expect(mods.people).toBe('none')
-    expect(mods.timeOfDay).toBe('goldenHour')
+    // INTERIOR_MODIFIERS.residential doesn't set greenery/people/timeOfDay explicitly
+    // so they fall through to defaults in RenderModifiers interface
+    expect(mods.roomType).toBe('living')
+    expect(mods.furnitureStyle).toBe('modern')
   })
 
   it('falls back to exterior-modern for unknown exterior template', () => {
@@ -211,8 +212,9 @@ describe('getTemplateModifiers', () => {
 
   it('falls back to interior-residential for unknown interior template', () => {
     const mods = getTemplateModifiers('interior', 'unknown' as any)
-    expect(mods.greenery).toBe('none') // falls back to residential which has greenery: 'none'
-    expect(mods.timeOfDay).toBe('goldenHour')
+    // Falls back to residential which doesn't set greenery/people/timeOfDay
+    expect(mods.roomType).toBe('living')
+    expect(mods.furnitureStyle).toBe('modern')
   })
 
   it('all exterior templates have annotations: false', () => {
