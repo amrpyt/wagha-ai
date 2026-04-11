@@ -117,6 +117,8 @@ export async function signIn(prevState: AuthState, formData: FormData) {
 // SIGN OUT
 // ================================================
 export async function signOut() {
+  const cookieStore = await cookies()
+  cookieStore.delete('supabase.auth.token')
   const supabase = await createClient()
   await supabase.auth.signOut()
   revalidatePath('/')
