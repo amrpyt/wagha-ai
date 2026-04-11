@@ -7,7 +7,11 @@ function decodeJWT(token: string): { sub: string; email?: string; aud: string; e
   try {
     const parts = token.split('.')
     if (parts.length !== 3) return null
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'))
+    // Handle base64url encoding (ES256 JWTs use this)
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    // Add padding if needed
+    const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
+    const payload = JSON.parse(Buffer.from(padded, 'base64').toString('utf-8'))
     return payload
   } catch {
     return null
@@ -52,9 +56,18 @@ export async function updateSession(request: NextRequest) {
 
   if (sessionCookie?.value) {
     try {
-      // Cookie value may be URL-encoded, so decode it before parsing
-      const decodedValue = decodeURIComponent(sessionCookie.value)
-      const session = JSON.parse(decodedValue)
+      // Cookie may be URL-encoded in some browsers — try decode first, fall back to raw
+      let cookieValue = sessionCookie.value
+      try {
+        const decoded = decodeURIComponent(sessionCookie.value)
+        // Only use decoded if it looks like valid JSON starts with '{'
+        if (decoded.startsWith('{')) {
+          cookieValue = decoded
+        }
+      } catch {
+        // decodeURIComponent failed — use raw value
+      }
+      const session = JSON.parse(cookieValue)
       if (session.access_token && !isTokenExpired(session.access_token)) {
         const payload = decodeJWT(session.access_token)
         if (payload?.sub) {

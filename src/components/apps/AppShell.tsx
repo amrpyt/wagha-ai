@@ -1,6 +1,6 @@
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { TopBar } from '@/components/dashboard/TopBar'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getUserFromCookie } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
 interface AppShellProps {
@@ -8,13 +8,14 @@ interface AppShellProps {
 }
 
 export async function AppShell({ children }: AppShellProps) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // Use cookie-based auth to bypass getUser() Bearer null bug
+  const user = await getUserFromCookie()
 
   if (!user) {
     redirect('/login')
   }
 
+  const supabase = await createClient()
   const { data: firmMember } = await supabase
     .from('firm_members')
     .select('firm_id, role, firms(name, brand_color)')

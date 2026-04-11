@@ -2,6 +2,42 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Database } from './database.types'
 
+// Decode JWT directly to get user (bypasses getUser() which has Bearer null bug)
+function decodeJWT(token: string): { sub: string; email?: string; exp?: number } | null {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf-8'))
+  } catch {
+    return null
+  }
+}
+
+// Get authenticated user from cookie without calling getUser() API (bypasses Bearer null bug)
+export async function getUserFromCookie() {
+  const cookieStore = await cookies()
+  const sessionCookie = cookieStore.get('supabase.auth.token')
+  if (!sessionCookie?.value) return null
+
+  try {
+    const cookieValue = sessionCookie.value.startsWith('{')
+      ? sessionCookie.value
+      : decodeURIComponent(sessionCookie.value)
+    const session = JSON.parse(cookieValue)
+    if (!session?.access_token) return null
+
+    const payload = decodeJWT(session.access_token)
+    if (!payload?.sub) return null
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null
+
+    return { id: payload.sub, email: payload.email }
+  } catch {
+    return null
+  }
+}
+
 export async function createClient() {
   const cookieStore = await cookies()
 
