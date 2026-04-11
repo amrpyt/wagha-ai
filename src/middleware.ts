@@ -10,6 +10,7 @@ export const config = {
     '/dashboard/:path*',
     '/settings/:path*',
     '/projects/:path*',
+    '/apps/:path*',
     '/login',
     '/signup',
     '/reset-password',
