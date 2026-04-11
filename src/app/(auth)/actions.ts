@@ -118,7 +118,13 @@ export async function signIn(prevState: AuthState, formData: FormData) {
 // ================================================
 export async function signOut() {
   const cookieStore = await cookies()
-  cookieStore.delete('supabase.auth.token')
+  cookieStore.set('supabase.auth.token', '', {
+    path: '/',
+    maxAge: 0,
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+  })
   const supabase = await createClient()
   await supabase.auth.signOut()
   revalidatePath('/')
