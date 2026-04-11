@@ -26,3 +26,41 @@ export async function createClient() {
     }
   )
 }
+
+// Set session cookies directly from access/refresh tokens (bypasses auth-js setSession)
+export async function setSessionCookies(accessToken: string, refreshToken: string) {
+  const cookieStore = await cookies()
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+
+  // Auth-js stores the session as JSON under the key 'supabase.auth.token'
+  const sessionData = {
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_at: Math.floor(Date.now() / 1000) + 3600,
+    expires_in: 3600,
+    token_type: 'bearer',
+    user: null,
+  }
+
+  const cookiesToSet = [
+    {
+      name: 'supabase.auth.token',
+      value: JSON.stringify(sessionData), // Pass raw JSON - cookieStore handles encoding
+      options: {
+        path: '/',
+        httpOnly: true,
+        secure: supabaseUrl.startsWith('https://'),
+        sameSite: 'lax' as const,
+        maxAge: 604800,
+      },
+    },
+  ]
+
+  cookiesToSet.forEach(({ name, value, options }) => {
+    try {
+      cookieStore.set(name, value, options)
+    } catch (err) {
+      console.error(`Failed to set cookie ${name}:`, err)
+    }
+  })
+}

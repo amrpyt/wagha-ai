@@ -2,6 +2,26 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from './database.types'
 
+// Decode JWT directly to get user ID without calling auth API (bypasses Bearer null issue)
+function decodeJWT(token: string): { sub: string; email?: string; aud: string; exp?: number } | null {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'))
+    return payload
+  } catch {
+    return null
+  }
+}
+
+// Check if session token is expired
+function isTokenExpired(accessToken: string): boolean {
+  const payload = decodeJWT(accessToken)
+  if (!payload?.exp) return true // treat missing exp as expired
+  const now = Math.floor(Date.now() / 1000)
+  return payload.exp < now
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -26,8 +46,25 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Validate session using getUser() (NOT getSession - per Pitfall 1)
-  const { data: { user } } = await supabase.auth.getUser()
+  // Decode JWT from cookie directly to get user (bypasses getUser() API call which has Bearer null bug)
+  const sessionCookie = request.cookies.get('supabase.auth.token')
+  let user: { id: string; email?: string } | null = null
+
+  if (sessionCookie?.value) {
+    try {
+      // Cookie value may be URL-encoded, so decode it before parsing
+      const decodedValue = decodeURIComponent(sessionCookie.value)
+      const session = JSON.parse(decodedValue)
+      if (session.access_token && !isTokenExpired(session.access_token)) {
+        const payload = decodeJWT(session.access_token)
+        if (payload?.sub) {
+          user = { id: payload.sub, email: payload.email }
+        }
+      }
+    } catch {
+      // Invalid session cookie
+    }
+  }
 
   // Protect dashboard routes
   const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')

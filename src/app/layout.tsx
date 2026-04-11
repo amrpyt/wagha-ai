@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { ThemeProvider } from 'next-themes'
 
 export const metadata: Metadata = {
   title: 'Wagha-ai | تصميم معماري بالذكاء الاصطناعي',
@@ -23,9 +22,7 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        <ThemeProvider attribute="class" enableSystem={true}>
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   )

@@ -1,7 +1,7 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient, setSessionCookies } from '@/lib/supabase/server'
+import { createAdminClient, createUserWithSession, signInWithPassword } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
@@ -9,9 +9,10 @@ type AuthState = { error?: string; success?: boolean; needsVerification?: boolea
 
 // ================================================
 // SIGN UP - creates user + firm + firm_member
+// Uses direct GoTrue API to bypass auth-js Bearer-null bug
 // ================================================
 export async function signUp(prevState: AuthState, formData: FormData) {
-  const supabase = await createClient()
+  const admin = createAdminClient()
 
   const email = formData.get('email') as string
   const password = formData.get('password') as string
@@ -30,42 +31,37 @@ export async function signUp(prevState: AuthState, formData: FormData) {
     return { error: 'البريد الإلكتروني غير صالح' }
   }
 
-  // Create auth user
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        firm_name: firmName,
-      },
-    },
-  })
-
-  if (authError) {
-    return { error: authError.message }
-  }
-
-  if (!authData.user) {
+  // Create user and session via direct GoTrue API (bypasses auth-js Bearer null bug)
+  let authResult: Awaited<ReturnType<typeof createUserWithSession>>
+  try {
+    authResult = await createUserWithSession(email, password, { firm_name: firmName })
+  } catch (err) {
+    console.error('createUserWithSession error:', err)
     return { error: 'فشل إنشاء الحساب' }
   }
 
-  // Create firm record using admin client (bypasses RLS - user has no session yet after signup)
-  // Note: Requires SUPABASE_SERVICE_ROLE_KEY in env
+  const { user, session } = authResult
+
+  if (!session || !session.access_token) {
+    return { error: 'فشل إنشاء الجلسة' }
+  }
+
+  // Create firm record using admin client (bypasses RLS)
   let firmId: string | null = null
   try {
-    const admin = createAdminClient()
     const { data: firm, error: firmError } = await admin
       .from('firms')
       .insert({
         name: firmName,
-        owner_id: authData.user.id,
+        owner_id: user.id,
         brand_color: '#1E3A5F',
       })
       .select('id')
       .single()
 
     if (firmError) {
-      await admin.auth.admin.deleteUser(authData.user.id)
+      // Try to delete the user we just created
+      await admin.auth.admin.deleteUser(user.id)
       return { error: 'فشل إنشاء الشركة' }
     }
     firmId = firm?.id ?? null
@@ -73,7 +69,7 @@ export async function signUp(prevState: AuthState, formData: FormData) {
     // Add user as admin firm_member
     await admin.from('firm_members').insert({
       firm_id: firmId,
-      user_id: authData.user.id,
+      user_id: user.id,
       role: 'admin',
     })
   } catch (err) {
@@ -81,23 +77,17 @@ export async function signUp(prevState: AuthState, formData: FormData) {
     return { error: 'فشل إنشاء الشركة' }
   }
 
-  // If Supabase says no email confirmation needed (disabled in Supabase dashboard),
-  // the user is immediately signed in — redirect to dashboard
-  if (!authData.user) {
-    revalidatePath('/dashboard')
-    redirect('/dashboard')
-  }
+  // Set session cookies directly (bypasses auth-js setSession which has Bearer null bug)
+  await setSessionCookies(session.access_token, session.refresh_token)
 
-  // Supabase sends verification email automatically
-  return { success: true, needsVerification: true }
+  revalidatePath('/dashboard')
+  redirect('/dashboard')
 }
 
 // ================================================
 // SIGN IN
 // ================================================
 export async function signIn(prevState: AuthState, formData: FormData) {
-  const supabase = await createClient()
-
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
@@ -105,14 +95,19 @@ export async function signIn(prevState: AuthState, formData: FormData) {
     return { error: 'البريد الإلكتروني وكلمة المرور مطلوبان' }
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-
-  if (error) {
+  let session: { access_token: string; refresh_token: string }
+  try {
+    session = await signInWithPassword(email, password)
+  } catch {
     return { error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' }
   }
+
+  if (!session?.access_token) {
+    return { error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' }
+  }
+
+  // Set session cookies directly
+  await setSessionCookies(session.access_token, session.refresh_token)
 
   revalidatePath('/dashboard')
   redirect('/dashboard')

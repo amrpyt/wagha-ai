@@ -10,6 +10,7 @@ export default function LoginPage() {
     <AuthCard title="تسجيل الدخول">
       <AuthForm
         action={signIn}
+        noRedirect={true}
         fields={[
           { name: 'email', label: 'البريد الإلكتروني', type: 'email', required: true },
           { name: 'password', label: 'كلمة المرور', type: 'password', required: true },

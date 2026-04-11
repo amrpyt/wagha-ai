@@ -1,23 +1,14 @@
 ---
-status: testing
+status: complete
 phase: 03-platform-redesign
 source: 03-PLAN.md
 started: 2026-04-10T03:25:00Z
-updated: 2026-04-10T03:25:00Z
+updated: 2026-04-10T17:50:00Z
 ---
 
 ## Current Test
 
-number: 4
-name: Modifier changes reflect in left panel immediately
-expected: |
-  In the left panel, expand "💡 الإضاءة والأجواء".
-  Visual cards are shown for Mood (محايد/حيوي/هادئ/دراماتيكي),
-  Weather (صافٍ/غائم/ماطر), Time of Day (صباحي/ظهر/ساعة ذهبية/ليل).
-
-  Click a different Mood card (e.g., "دراماتيكي").
-  The selected card is visually highlighted (darker background/border).
-awaiting: user response
+[testing complete]
 
 ## Tests
 
@@ -69,7 +60,7 @@ expected: |
   - A ✕ (remove) button on the right
   Dropzone is replaced by the preview (no double upload prompt).
 result: skipped
-reported: "Cannot test file upload via browser automation — system file picker cannot be controlled by agent-browser"
+reason: "Cannot test file upload via browser automation — system file picker cannot be controlled by agent-browser"
 
 ### 6. Custom prompt textarea accepts Arabic text
 expected: |
@@ -88,7 +79,7 @@ expected: |
   2 thumbnail previews appear (w-20 h-20) with ✕ remove buttons.
   The remaining slots (2 left) are still shown.
 result: skipped
-reported: "Cannot test file upload via browser automation — system file picker cannot be controlled by agent-browser"
+reason: "Cannot test file upload via browser automation — system file picker cannot be controlled by agent-browser"
 
 ### 8. Save preset modal opens and closes
 expected: |
@@ -144,16 +135,15 @@ expected: |
   Note: This test requires a valid AI API key. If API is not configured,
   expect an error message in the error display.
 result: skipped
-reported: "Requires file upload and valid AI API key — cannot test in current environment"
+reason: "Requires file upload and valid AI API key — cannot test in current environment"
 
 ## Summary
 
 total: 12
 passed: 5
-issues: 2
-pending: 0
-skipped: 3
-blocked: 2
+issues: 3
+skipped: 4
+blocked: 0
 
 ## Gaps
 

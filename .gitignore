@@ -35,3 +35,4 @@ python-gemini/
 .gstack/
 
 .vercel
+.env*.local

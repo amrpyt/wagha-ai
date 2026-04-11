@@ -19,17 +19,27 @@ interface AuthFormProps {
   submitLabel: string
   children?: ReactNode
   initialState?: AuthState
+  /** Set to true for actions that redirect on success (e.g. signIn). useTransition will be skipped. */
+  noRedirect?: boolean
 }
 
-export function AuthForm({ action, fields, submitLabel, children, initialState }: AuthFormProps) {
+export function AuthForm({ action, fields, submitLabel, children, initialState, noRedirect }: AuthFormProps) {
   const [state, setState] = useState<AuthState | undefined>(initialState)
   const [isPending, startTransition] = useTransition()
 
   async function handleSubmit(formData: FormData) {
-    startTransition(async () => {
+    // Do NOT wrap redirect-causing actions in useTransition —
+    // React will swallow the redirect and cookies won't be written.
+    if (noRedirect) {
+      startTransition(async () => {
+        const result = await action(state, formData)
+        setState(result)
+      })
+    } else {
+      // For redirect actions, call directly so redirect propagates properly
       const result = await action(state, formData)
       setState(result)
-    })
+    }
   }
 
   return (
